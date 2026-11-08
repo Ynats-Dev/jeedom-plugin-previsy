@@ -11,6 +11,7 @@
 - NEW: The cache is reloaded automatically when the API or the location changes.
 - BUG: The minimum warning level was displayed empty on an existing equipment; the "API utilisée" and "Type_degre" commands can no longer be deleted; the warning and custom alert frames no longer overflow the widget; the refresh icon is back in the widget title bar.
 - BUG: PHP warning in the predictive text of an alert without precipitation (wind, fog).
+- BUG: "fputs(): Argument #1 ($stream) must be of type resource" error in the scheduled task when the data/json folder is not writable: permissions are fixed automatically, otherwise the cache is stored in the Jeedom temporary folder, without blocking the plugin.
 - BUG: An equipment defined only by its coordinates was not updated when saved.
 - BUG: "City not found" errors from prevision-meteo.ch were not detected.
 - BUG: Negative coordinates (West longitude, southern hemisphere) could not be entered.
