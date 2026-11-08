@@ -368,7 +368,7 @@ class previsy_vigilance {
                     . $niveaux[$vigilance['niveau']]['hex'] . "; margin-right:5px;'></span><span style='font-weight:bold;'>" . htmlspecialchars($vigilance['evenement']) . "</span> <span style='opacity:0.7;'>(" . $periode . ")</span></div>";
         }
         $couleur = $niveaux[$_resultat['niveau']]['hex'];
-        return "<div class='previsyWidget previsyVigilance' style='width:calc(100% - 10px); text-align:left; border:2px solid " . $couleur . "; border-left-width:8px;'>"
+        return "<div class='previsyWidget previsyVigilance' style='width:calc(100% - 10px); box-sizing:border-box; text-align:left; border:2px solid " . $couleur . "; border-left-width:8px;'>"
                 . "<div style='font-size:0.9em; opacity:0.8;'><i class='fas fa-exclamation-triangle' style='color:" . $couleur . ";'></i> " . __('Vigilance', __FILE__) . ' ' . htmlspecialchars($_resultat['zone']) . "</div>"
                 . $lignes . "</div>";
     }

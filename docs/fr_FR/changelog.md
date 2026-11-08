@@ -6,11 +6,12 @@
 - NOUVEAU : Alertes personnalisées (onglet « Mes alertes ») : combinez pluie, neige, vent, rafales, direction du vent, température, température ressentie, humidité, pression, plage horaire et durée minimale. Chaque alerte a ses propres commandes.
 - NOUVEAU : Vigilance météo nationale via MeteoAlarm (Météo-France, IRM, MétéoSuisse...) : bandeau dans le widget et commandes dédiées. En France, le département est détecté automatiquement.
 - NOUVEAU : Possibilité de désactiver les alertes météo standards et l'alerte vent.
-- BUG : Un équipement défini uniquement par ses coordonnées n'était pas mis à jour à la sauvegarde.
 - NOUVEAU : Choix de l'API météo dans la configuration du plugin, pour tous les équipements d'un coup : Open-Meteo (monde entier, sans clé, recommandé) ou prevision-meteo.ch, ou choix par équipement. Une mise à jour conserve le fonctionnement actuel (choix par équipement, équipements existants sur prevision-meteo.ch). Architecture « bridge » pour ajouter d'autres API.
 - NOUVEAU : Repli automatique sur l'autre API en cas d'indisponibilité, avec warning dans les logs, message dans le centre de messages, mention dans le widget et commande « API utilisée ». Retour automatique sur l'API choisie dès qu'elle répond.
-- BUG : Warning PHP dans le texte prédictif d'une alerte sans précipitation (vent, brouillard).
 - NOUVEAU : Le cache est rechargé automatiquement quand l'API ou le lieu change.
+- BUG : Le niveau minimum de vigilance s'affichait vide sur un équipement existant ; les commandes « API utilisée » et « Type_degre » ne sont plus supprimables ; les cadres de vigilance et d'alertes personnalisées ne débordent plus du widget ; l'icône de rafraîchissement est de nouveau dans le bandeau de titre du widget.
+- BUG : Un équipement défini uniquement par ses coordonnées n'était pas mis à jour à la sauvegarde.
+- BUG : Warning PHP dans le texte prédictif d'une alerte sans précipitation (vent, brouillard).
 - BUG : Les erreurs « ville introuvable » de prevision-meteo.ch n'étaient pas détectées.
 - BUG : Les coordonnées négatives (longitude Ouest, hémisphère Sud) ne pouvaient pas être saisies.
 - BUG : Le total de précipitations est arrondi.

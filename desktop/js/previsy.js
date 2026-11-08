@@ -133,7 +133,14 @@ function previsyAddRegle(_regle) {
 }
 
 function printEqLogic(_eqLogic) {
-    setTimeout(previsyChargerZones, 100); // après que Jeedom a rempli le champ Pays
+    setTimeout(function () {
+        // Équipement qui n'a jamais enregistré ce réglage : on affiche la valeur utilisée par défaut (jaune)
+        var niveau = $('.eqLogicAttr[data-l1key=configuration][data-l2key=vigilanceNiveauMin]');
+        if (!niveau.val()) {
+            niveau.val('2');
+        }
+        previsyChargerZones(); // après que Jeedom a rempli le champ Pays
+    }, 100);
     $('#div_previsyRegles').empty();
     var regles = (_eqLogic && _eqLogic.configuration) ? _eqLogic.configuration.alertesPerso : null;
     if (typeof regles === 'string') {
