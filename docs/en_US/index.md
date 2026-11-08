@@ -28,6 +28,8 @@ As you can see, forecasts can help you in many ways.
 
 ### With the widget and prebuilt sentences.
 
+The widget is available on the dashboard and in the mobile app.
+
 ![previsy1](../images/widget-sans-txt.png)
 
 ### Using the raw data directly
@@ -196,7 +198,7 @@ Each alert creates its own commands, named after the alert (e.g. "Sailing - In p
 In the **Warning** tab, Previsy can report the official weather warnings (Météo-France, RMI, MeteoSwiss...) published by [MeteoAlarm](https://meteoalarm.org), without API key: violent wind, rain-flood, flooding, thunderstorms, snow-ice, heat wave, extreme cold, avalanches, waves-submersion...
 
 - **Country**: France, Belgium, Switzerland, Luxembourg and other European countries.
-- **Area**: in France, leave it empty, the department is found automatically from the city or the coordinates. Elsewhere, enter the region name as shown on meteoalarm.org.
+- **Area**: in France, leave it empty, the department is found automatically from the city or the coordinates. Elsewhere, enter the region name as shown on meteoalarm.org. The field suggests the areas found in the country's feed: only areas that recently had a warning are listed, so the list may be incomplete (or empty).
 - **Minimum level**: yellow, orange or red.
 
 The warning is displayed as a coloured banner at the top of the widget and in the following commands:
@@ -204,7 +206,7 @@ The warning is displayed as a coloured banner at the top of the widget and in th
 | Type | Command | Description |
 | --- | --- | --- |
 | numeric info | Warning level | 0 = none, 2 = yellow, 3 = orange, 4 = red (historized) |
-| string info | Warning colour | none, yellow, orange or red (values in French: aucune, jaune, orange, rouge) |
+| string info | Warning colour | none, yellow, orange or red (in French if Jeedom is in French: aucune, jaune, orange, rouge) |
 | binary info | Warning in progress | 1 if the warning has started (0 if it is only announced) |
 | string info | Warning text | E.g. "Vigilance orange pluie-inondation (Gard) jusqu'au 05/11/2026 00:00." |
 | string info | Warning area | Area used (detected or entered department) |
@@ -226,7 +228,7 @@ The warning is displayed as a coloured banner at the top of the widget and in th
 | info | Longitude | As its name indicates | 
 | info | Type_degre | °C ou °F | 
 | info | API utilisée | API that provided the latest forecast, followed by "(repli)" if the chosen API was unavailable. | 
-| action | Rafraichir | The famous command to refresh the widget. This will launch a synchronization with the chosen weather API (if the cache has expired). | 
+| action | Rafraichir | The famous command to refresh the widget. It reloads the forecast from the chosen weather API, at most once every 5 minutes (otherwise the cache is used). | 
 
 ### Controls related to alerts
 

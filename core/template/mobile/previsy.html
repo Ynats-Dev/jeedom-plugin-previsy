@@ -1,0 +1,52 @@
+<div class="eqLogic eqLogic-widget" data-eqType="#eqType#" data-eqLogic_id="#id#" data-eqLogic_uid="#uid#" data-version="#version#" data-translate-category="#translate_category#" data-category="#category#" data-tags="#tags#" style="#style#">
+    <span class="cmd refresh cursor" data-cmd_id="#refresh_id#" style="float:right; padding:2px 6px;">
+        <i class="fas fa-sync"></i>
+    </span>
+    <center class="widget-name">#name_display# <span class="object_name">#object_name#</span></center>
+
+    <div class="previsyMobile">
+        #previsy_source#
+        #previsy_vigilance#
+        #previsy_perso#
+        #alerte_01_widget#
+        #alerte_02_widget#
+        #alerte_03_widget#
+        #alerte_04_widget#
+        #alerte_05_widget#
+    </div>
+
+    <script>
+        $('.eqLogic[data-eqLogic_uid=#uid#] .cmd.refresh').on('click', function () {
+            jeedom.cmd.execute({id: $(this).data('cmd_id')});
+        });
+    </script>
+    <style>
+        /* Même contenu que le widget dashboard, mis en page pour un écran étroit */
+        .previsyMobile .previsyWidget {
+            border: 1px dotted grey;
+            padding: 5px;
+            margin: 0 0 5px 0;
+            text-align: center;
+            box-sizing: border-box;
+            width: 100% !important;
+            float: none !important;
+        }
+        .previsyMobile .previsyWidget img { width: 45px; }
+        .previsyMobile .previsyBlock {
+            display: inline-block;
+            vertical-align: top;
+            width: 31%;
+            min-width: 90px;
+            margin: 4px 1%;
+            text-align: center;
+        }
+        .previsyMobile .previsyBlockMoyenne { width: 100%; margin: 2px 0; }
+        .previsyMobile .previsyBlockMinMax { width: 100%; margin: 2px 0; overflow: hidden; }
+        .previsyMobile .previsySubBlock { width: 45%; text-align: center; }
+        .previsyMobile .previsySubBlock_G { float: left; }
+        .previsyMobile .previsySubBlock_D { float: right; }
+        .previsyMobile .previsySubTitleMoyenne { font-size: 0.7em; }
+        .previsyMobile .previsySubChiffreMoyenne { font-size: 1.3em; }
+        .previsyMobile textarea { width: 100%; box-sizing: border-box; }
+    </style>
+</div>

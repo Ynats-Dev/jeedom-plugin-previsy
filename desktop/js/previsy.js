@@ -133,6 +133,7 @@ function previsyAddRegle(_regle) {
 }
 
 function printEqLogic(_eqLogic) {
+    setTimeout(previsyChargerZones, 100); // après que Jeedom a rempli le champ Pays
     $('#div_previsyRegles').empty();
     var regles = (_eqLogic && _eqLogic.configuration) ? _eqLogic.configuration.alertesPerso : null;
     if (typeof regles === 'string') {
@@ -177,3 +178,41 @@ $('#div_previsyRegles').off('click', '.bt_previsyRemoveRegle').on('click', '.bt_
 $('#div_previsyRegles').off('change', 'input, select').on('change', 'input, select', function () {
     previsyModifie();
 });
+
+/*
+ * ---------------------------------------------------------------------------------------------
+ * Vigilance : suggestions de zones pour le pays choisi (zones présentes dans le flux MeteoAlarm)
+ * ---------------------------------------------------------------------------------------------
+ */
+function previsyChargerZones() {
+    var pays = $('#previsyVigilancePays').val();
+    var datalist = $('#previsyVigilanceZones');
+    var info = $('#previsyVigilanceZonesInfo');
+    datalist.empty();
+    info.text('');
+    if (!pays) {
+        return;
+    }
+    $.ajax({
+        type: 'POST',
+        url: 'plugins/previsy/core/ajax/previsy.ajax.php',
+        data: {action: 'getVigilanceZones', pays: pays},
+        dataType: 'json',
+        global: false,
+        success: function (data) {
+            if (data.state != 'ok' || !Array.isArray(data.result)) {
+                return;
+            }
+            for (var i in data.result) {
+                datalist.append($('<option>').attr('value', data.result[i]));
+            }
+            if (data.result.length == 0) {
+                info.text('{{Aucune zone dans le flux actuel : saisissez le nom de la région tel qu\'il apparaît sur meteoalarm.org.}}');
+            } else {
+                info.text(data.result.length + ' {{zone(s) suggérée(s) (zones ayant eu une vigilance récemment).}}');
+            }
+        }
+    });
+}
+
+$('#previsyVigilancePays').off('change.previsy').on('change.previsy', previsyChargerZones);

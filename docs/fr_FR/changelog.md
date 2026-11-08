@@ -1,4 +1,8 @@
-# 08/11/2026 | Beta 1.1.0
+# 08/11/2026 | Beta 2.0.0
+- NOUVEAU : Widget pour l'application mobile.
+- NOUVEAU : La commande Rafraichir recharge réellement les prévisions depuis l'API (au plus une fois toutes les 5 minutes).
+- NOUVEAU : Suggestions de zones de vigilance pour le pays choisi.
+- NOUVEAU : Couleur de vigilance traduite selon la langue de Jeedom.
 - NOUVEAU : Alertes personnalisées (onglet « Mes alertes ») : combinez pluie, neige, vent, rafales, direction du vent, température, température ressentie, humidité, pression, plage horaire et durée minimale. Chaque alerte a ses propres commandes.
 - NOUVEAU : Vigilance météo nationale via MeteoAlarm (Météo-France, IRM, MétéoSuisse...) : bandeau dans le widget et commandes dédiées. En France, le département est détecté automatiquement.
 - NOUVEAU : Possibilité de désactiver les alertes météo standards et l'alerte vent.

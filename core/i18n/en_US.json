@@ -121,7 +121,9 @@
         "aucune case = toutes directions": "no box = all directions",
         "heure(s) consécutive(s)": "consecutive hour(s)",
         "max": "max",
-        "min": "min"
+        "min": "min",
+        "Aucune zone dans le flux actuel : saisissez le nom de la région tel qu\\'il apparaît sur meteoalarm.org.": "No area in the current feed: enter the region name as shown on meteoalarm.org.",
+        "zone(s) suggérée(s) (zones ayant eu une vigilance récemment).": "suggested area(s) (areas that recently had a warning)."
     },
     "plugins\/previsy\/core\/class\/previsy.class.php": {
         "UpdateDatas :. ": "UpdateDatas :. ",
@@ -425,6 +427,11 @@
         "Vigilance texte": "Warning text",
         "Vigilance zone": "Warning area",
         "Vigilance début": "Warning start",
-        "Vigilance fin": "Warning end"
+        "Vigilance fin": "Warning end",
+        "aucune": "none",
+        "vert": "green",
+        "jaune": "yellow",
+        "orange": "orange",
+        "rouge": "red"
     }
 }
