@@ -8,6 +8,8 @@ Description
 
 This plugin announces the next weather alerts (72H), worldwide with Open-Meteo or in France, Belgium and Switzerland with prevision-meteo.ch. Previsy also builds sentences that can be used to be sent to you by sms, announced by your home or slack etc...
 
+You can also create your own alerts by combining conditions (rain, wind, direction, temperature, humidity, pressure, time range...) and receive the official weather warnings (Météo-France, RMI, MeteoSwiss...). The widget is available on the dashboard and in the mobile app.
+
 ## Examples of use
 
 ### Everyday life alerts
@@ -106,6 +108,10 @@ You can display temperatures in degrees Celsius (°C) or Fahrenheit (°F).
 ### Commands to display (optional for your scenarios)
 Data allowing you to create your custom scenarios. You just have to check the commands you wish to see appear. You probably won't need to use all of them. (all commands will be described later). 
 
+This list only appears in **advanced** or **debug** mode (drop-down list at the top right of the plugin configuration).
+
+![previsy-config-avance](../images/config-avance.png)
+
 **Warning**
 > If you want to display 5 alerts and all the commands you will get a lot of them! 
 
@@ -122,6 +128,10 @@ If you disable the scheduled task that takes place every hour ... the plugin wil
 
 Management
 ===
+
+![previsy-gestion](../images/gestion.png)
+
+The **Debug** button only appears in debug mode (drop-down list at the top right of the plugin configuration).
 
 ## Equipment
 
@@ -167,6 +177,8 @@ Tick this box to stop receiving the standard alerts (rain, snow, thunderstorm, f
 
 In the **My alerts** tab, create as many alerts as you want (up to 20 per equipment). An alert is triggered on the hours when **all the conditions you filled in** are true; empty fields are ignored.
 
+![previsy-mes-alertes](../images/mes-alertes.png)
+
 | Condition | Description |
 | --- | --- |
 | Rain / Snow | Any, Yes (it rains / it snows) or No (it does not rain / it does not snow) |
@@ -193,15 +205,23 @@ Each alert creates its own commands, named after the alert (e.g. "Sailing - In p
 | numeric info | *Name* - Number of periods | Number of periods found within 72 hours |
 | string info | *Name* - Text | Ready-to-send sentence, followed by your message |
 
+In the widget, each alert takes one line: upcoming ("Dans 13 h : 09/11 08H00 → 13H00"), in progress ("En cours, jusqu'à 13H00") or nothing expected within 72 hours. Hovering over a line shows the full sentence with your message.
+
+![previsy-widget-alertes](../images/widget-alertes.png)
+
 ## National weather warnings
 
 In the **Warning** tab, Previsy can report the official weather warnings (Météo-France, RMI, MeteoSwiss...) published by [MeteoAlarm](https://meteoalarm.org), without API key: violent wind, rain-flood, flooding, thunderstorms, snow-ice, heat wave, extreme cold, avalanches, waves-submersion...
+
+![previsy-vigilance](../images/vigilance.png)
 
 - **Country**: France, Belgium, Switzerland, Luxembourg and other European countries.
 - **Area**: in France, leave it empty, the department is found automatically from the city or the coordinates. Elsewhere, enter the region name as shown on meteoalarm.org. The field suggests the areas found in the country's feed: only areas that recently had a warning are listed, so the list may be incomplete (or empty).
 - **Minimum level**: yellow, orange or red.
 
-The warning is displayed as a coloured banner at the top of the widget and in the following commands:
+The warning is displayed as a banner at the top of the widget (see the picture in the previous section): the frame takes the colour of the highest level, and each phenomenon is listed with its period. Hovering shows the official description. The banner only appears when a warning is in progress or announced.
+
+The warning is also available in the following commands:
 
 | Type | Command | Description |
 | --- | --- | --- |

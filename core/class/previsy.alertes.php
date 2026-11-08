@@ -368,7 +368,7 @@ class previsy_alertes {
         if ($lignes == '') {
             return '';
         }
-        return "<div class='previsyWidget previsyPerso' style='width:calc(100% - 10px); text-align:left;'>" . $lignes . "</div>";
+        return "<div class='previsyWidget previsyPerso' style='width:calc(100% - 10px); box-sizing:border-box; text-align:left;'>" . $lignes . "</div>";
     }
 
 }

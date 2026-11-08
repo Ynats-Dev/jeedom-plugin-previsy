@@ -10,6 +10,8 @@ Description
 
 Ce plugin annonce les prochaines alertes (72H) météo, partout dans le monde avec Open-Meteo ou en France, Belgique et Suisse avec prevision-meteo.ch. Previsy construit également des phrases qui peuvent être utilisées pour vous être envoyées par sms, annoncées par votre home ou slack etc...
 
+Vous pouvez aussi créer vos propres alertes en combinant des conditions (pluie, vent, direction, température, humidité, pression, plage horaire...) et recevoir les vigilances officielles (Météo-France, IRM, MétéoSuisse...). Le widget est disponible sur le dashboard et dans l'application mobile.
+
 ## Exemples d'utilisation
 
 ### Alertes de la vie courante
@@ -108,6 +110,10 @@ Vous avez la possibilité d'afficher les températures en degrés Celsius (°C) 
 ### Commandes à afficher (en option pour vos scénarios)
 Les données vous permettant de créer vos scénarios sur mesure. Il vous suffit de cocher les commandes que vous souhaitez voir apparaitre. Vous n'aurez probablement pas besoin de tout utiliser. (toutes les commandes seront décrites par la suite). 
 
+Cette liste n'apparaît qu'en mode **avancé** ou **debug** (liste déroulante en haut à droite de la configuration du plugin).
+
+![previsy-config-avance](docs/images/config-avance.png)
+
 **Attention**
 > Si vous voulez afficher 5 alertes et toutes les commandes vous allez en avoir beaucoup ! 
 
@@ -124,6 +130,10 @@ Si vous désactivez la tâche planifiée qui à lieu toutes les heures ... le pl
 
 Gestion
 ===
+
+![previsy-gestion](docs/images/gestion.png)
+
+Le bouton **Debug** n'apparaît qu'en mode debug (liste déroulante en haut à droite de la configuration du plugin).
 
 ## Equipement
 
@@ -168,6 +178,8 @@ Cochez cette case pour ne plus recevoir les alertes standards (pluie, neige, ora
 
 Dans l'onglet **Mes alertes**, créez autant d'alertes que vous voulez (20 au maximum par équipement). Une alerte se déclenche sur les heures où **toutes les conditions renseignées** sont vraies ; les champs laissés vides sont ignorés.
 
+![previsy-mes-alertes](docs/images/mes-alertes.png)
+
 | Condition | Description |
 | --- | --- |
 | Pluie / Neige | Indifférent, Oui (il pleut / il neige) ou Non (il ne pleut pas / il ne neige pas) |
@@ -194,17 +206,25 @@ Chaque alerte crée ses propres commandes, nommées d'après l'alerte (ex. « Vo
 | info numérique | *Nom* - Nombre de périodes | Nombre de périodes trouvées sur 72 heures |
 | info texte | *Nom* - Texte | Phrase prête à envoyer, suivie de votre message |
 
+Dans le widget, chaque alerte occupe une ligne : à venir (« Dans 13 h : 09/11 08H00 → 13H00 »), en cours (« En cours, jusqu'à 13H00 ») ou rien de prévu sur 72 heures. Le survol d'une ligne affiche la phrase complète avec votre message.
+
+![previsy-widget-alertes](docs/images/widget-alertes.png)
+
 Vous pouvez désactiver les alertes standards (pluie, neige, orage, brouillard) dans l'onglet Equipement, et choisir « Aucune alerte liée au vent », pour ne garder que vos propres alertes.
 
 ## Vigilance météo nationale
 
 Dans l'onglet **Vigilance**, Previsy peut remonter les vigilances officielles (Météo-France, IRM, MétéoSuisse...) diffusées par [MeteoAlarm](https://meteoalarm.org), sans clé API : vent violent, pluie-inondation, inondation, orages, neige-verglas, canicule, grand froid, avalanches, vagues-submersion...
 
+![previsy-vigilance](docs/images/vigilance.png)
+
 - **Pays** : France, Belgique, Suisse, Luxembourg et d'autres pays européens.
 - **Zone** : en France, laissez vide, le département est trouvé automatiquement depuis la ville ou les coordonnées. Ailleurs, saisissez le nom de la région tel qu'il apparaît sur meteoalarm.org. Le champ propose les zones présentes dans le flux du pays : seules celles ayant eu une vigilance récemment y figurent, la liste peut donc être incomplète (voire vide).
 - **Niveau minimum** : jaune, orange ou rouge.
 
-La vigilance s'affiche en bandeau coloré en haut du widget et dans les commandes suivantes :
+La vigilance s'affiche en bandeau en haut du widget (voir l'image de la section précédente) : le cadre prend la couleur du niveau le plus élevé, et chaque phénomène est listé avec sa période. Le survol affiche la description officielle. Le bandeau n'apparaît que s'il y a une vigilance en cours ou annoncée.
+
+La vigilance est aussi disponible dans les commandes suivantes :
 
 | Type | Commande | Description |
 | --- | --- | --- |
