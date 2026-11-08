@@ -38,6 +38,7 @@ class previsy extends eqLogic {
     public static $_prevHeure = 72; // Heure max de récupération des données dans le Json
     public static $_maxAlerte = 5; // Nombre max d'alerte ou widget à afficher
     public static $_timeSynchro = 3600 * 2; // Synchro avec le site distant tous les X secondes
+    public static $_timeRefreshForce = 300; // Rafraichir manuel : rechargement depuis l'API au plus toutes les X secondes
 
     /*     * **************************Configuration************************* */
 
@@ -1126,7 +1127,7 @@ class previsy extends eqLogic {
         return $return;
     }
 
-    public function updateJsonDatas($_id = NULL) {
+    public function updateJsonDatas($_id = NULL, $_force = FALSE) {
         log::add('previsy', 'debug', '---------------------------------------------------------------------------------------');
 
         $eqLogic = eqLogic::byId($_id);
@@ -1137,7 +1138,10 @@ class previsy extends eqLogic {
         $tempJson = self::$_jsonTampon . $_id . ".json";
         $api = previsy_bridge::getLabel(previsy_bridge::getApi($eqLogic));
 
-        if (self::jsonTestTimeRefresh($tempJson, $eqLogic) == TRUE) {
+        // Rafraichir manuel : on recharge depuis l'API même si le cache est valide (sauf rechargement très récent)
+        $force = ($_force AND is_file($tempJson) AND (time() - filemtime($tempJson)) > self::$_timeRefreshForce);
+
+        if ($force OR self::jsonTestTimeRefresh($tempJson, $eqLogic) == TRUE) {
             log::add('previsy', 'debug', __('updateJsonDatas :. ', __FILE__) . __('Cache expiré, absent ou configuration modifiée : rechargement depuis ', __FILE__) . $api);
             if ($eqLogic->miseEnCacheJson($_id) != TRUE) {
                 // API injoignable : on ne réutilise l'ancien cache que s'il correspond toujours au lieu et à l'API configurés
@@ -1453,7 +1457,7 @@ class previsyCmd extends cmd {
             case 'refresh': // LogicalId de la commande rafraîchir que l’on a créé dans la méthode Postsave 
                 log::add('previsy', 'debug', '---------------------------------------------------------------------------------------');
                 log::add('previsy', 'debug', __('execute :. ', __FILE__) . __('Lancement de la commande refresh : #ID# ', __FILE__) . $eqlogic->getId());
-                $eqlogic->updateJsonDatas($eqlogic->getId());
+                $eqlogic->updateJsonDatas($eqlogic->getId(), TRUE);
                 break;
         }
     }

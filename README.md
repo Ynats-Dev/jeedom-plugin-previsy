@@ -30,6 +30,8 @@ Comme vous pouvez le voir, les prévisions peuvent vous aider sur pas mal de poi
 
 ### Avec le widget et les phrases préconstruites.
 
+Le widget est disponible sur le dashboard et dans l'application mobile.
+
 ![previsy1](docs/images/widget-sans-txt.png)
 
 ### En utilisant directement les données brutes
@@ -199,7 +201,7 @@ Vous pouvez désactiver les alertes standards (pluie, neige, orage, brouillard) 
 Dans l'onglet **Vigilance**, Previsy peut remonter les vigilances officielles (Météo-France, IRM, MétéoSuisse...) diffusées par [MeteoAlarm](https://meteoalarm.org), sans clé API : vent violent, pluie-inondation, inondation, orages, neige-verglas, canicule, grand froid, avalanches, vagues-submersion...
 
 - **Pays** : France, Belgique, Suisse, Luxembourg et d'autres pays européens.
-- **Zone** : en France, laissez vide, le département est trouvé automatiquement depuis la ville ou les coordonnées. Ailleurs, saisissez le nom de la région tel qu'il apparaît sur meteoalarm.org.
+- **Zone** : en France, laissez vide, le département est trouvé automatiquement depuis la ville ou les coordonnées. Ailleurs, saisissez le nom de la région tel qu'il apparaît sur meteoalarm.org. Le champ propose les zones présentes dans le flux du pays : seules celles ayant eu une vigilance récemment y figurent, la liste peut donc être incomplète (voire vide).
 - **Niveau minimum** : jaune, orange ou rouge.
 
 La vigilance s'affiche en bandeau coloré en haut du widget et dans les commandes suivantes :
@@ -207,7 +209,7 @@ La vigilance s'affiche en bandeau coloré en haut du widget et dans les commande
 | Type | Commande | Description |
 | --- | --- | --- |
 | info numérique | Vigilance niveau | 0 = aucune, 2 = jaune, 3 = orange, 4 = rouge (historisée) |
-| info texte | Vigilance couleur | aucune, jaune, orange ou rouge |
+| info texte | Vigilance couleur | aucune, jaune, orange ou rouge (en anglais si Jeedom est en anglais : none, yellow, orange, red) |
 | info binaire | Vigilance en cours | 1 si la vigilance a commencé (0 si elle est seulement annoncée) |
 | info texte | Vigilance texte | Ex. « Vigilance orange pluie-inondation (Gard) jusqu'au 05/11/2026 00:00. » |
 | info texte | Vigilance zone | Zone utilisée (département détecté ou saisi) |
@@ -229,7 +231,7 @@ La vigilance s'affiche en bandeau coloré en haut du widget et dans les commande
 | info | Longitude | Comme son nom l'indique | 
 | info | Type_degre | °C ou °F | 
 | info | API utilisée | API qui a fourni les dernières prévisions, suivie de « (repli) » si l'API choisie était indisponible. | 
-| action | Rafraichir | La fameuse commande permettant de rafraîchir le widget. Cela lancera une synchronisation avec l'API météo choisie (si le cache a expiré). | 
+| action | Rafraichir | La fameuse commande permettant de rafraîchir le widget. Elle recharge les prévisions depuis l'API météo choisie, au plus une fois toutes les 5 minutes (au-delà, le cache est utilisé). | 
 
 ### Les commandes liées aux alertes
 

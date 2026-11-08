@@ -26,7 +26,11 @@ try {
     
     ajax::init();
 
-
+    // Suggestions de zones de vigilance pour un pays (onglet Vigilance)
+    if (init('action') == 'getVigilanceZones') {
+        require_once __DIR__ . '/../class/previsy.class.php';
+        ajax::success(previsy_vigilance::getZonesConnues(init('pays')));
+    }
 
     throw new Exception(__('Aucune méthode correspondante à : ', __FILE__) . init('action'));
     /*     * *********Catch exeption*************** */

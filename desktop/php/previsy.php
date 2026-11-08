@@ -208,7 +208,7 @@ sendVarToJS('previsyApiGlobale', (previsy_bridge::getMode() == previsy_bridge::M
                         <div class="form-group">
                             <label class="col-sm-3 control-label">{{Pays}}</label>
                             <div class="col-sm-3">
-                                <select class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="vigilancePays">
+                                <select class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="vigilancePays" id="previsyVigilancePays">
                                     <option value="">{{Vigilance désactivée}}</option>
                                     <?php
                                     foreach (previsy_vigilance::getPays() as $paysId => $paysNom) {
@@ -221,8 +221,10 @@ sendVarToJS('previsyApiGlobale', (previsy_bridge::getMode() == previsy_bridge::M
                         <div class="form-group">
                             <label class="col-sm-3 control-label">{{Zone (département, région...)}}</label>
                             <div class="col-sm-3">
-                                <input type="text" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="vigilanceZone" placeholder="{{Automatique (France)}}"/>
+                                <input type="text" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="vigilanceZone" placeholder="{{Automatique (France)}}" list="previsyVigilanceZones" autocomplete="off"/>
+                                <datalist id="previsyVigilanceZones"></datalist>
                             </div>
+                            <div class="col-sm-5" style="padding-top:7px; opacity:0.7;" id="previsyVigilanceZonesInfo"></div>
                         </div>
                         <div class="form-group">
                             <label class="col-sm-3 control-label">{{Niveau minimum}}</label>

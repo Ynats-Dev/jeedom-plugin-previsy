@@ -1,4 +1,8 @@
-# 11/08/2026 | Beta 1.1.0
+# 11/08/2026 | Beta 2.0.0
+- NEW: Widget for the mobile app.
+- NEW: The Rafraichir command really reloads the forecast from the API (at most once every 5 minutes).
+- NEW: Warning area suggestions for the chosen country.
+- NEW: Warning colour translated according to the Jeedom language.
 - NEW: Choice of the weather API in the plugin configuration, for all equipments at once: Open-Meteo (worldwide, no key, recommended) or prevision-meteo.ch, or choice per equipment. An update keeps the current behaviour (choice per equipment, existing equipments on prevision-meteo.ch).
 - NEW: Automatic fallback to the other API when unavailable, with a warning in the logs, a message in the message center, a note in the widget and an "API utilisée" command. Automatic return to the chosen API as soon as it responds.
 - BUG: PHP warning in the predictive text of an alert without precipitation (wind, fog).

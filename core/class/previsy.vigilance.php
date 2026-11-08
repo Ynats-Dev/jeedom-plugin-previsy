@@ -53,11 +53,12 @@ class previsy_vigilance {
 
     public static function getNiveaux() {
         return array(
-            0 => array('couleur' => 'aucune', 'hex' => ''),
-            1 => array('couleur' => 'vert', 'hex' => '#31AA35'),
-            2 => array('couleur' => 'jaune', 'hex' => '#FFD600'),
-            3 => array('couleur' => 'orange', 'hex' => '#FF9800'),
-            4 => array('couleur' => 'rouge', 'hex' => '#E53935'),
+            // Couleur traduite selon la langue de Jeedom (en anglais : none, green, yellow, orange, red)
+            0 => array('couleur' => __('aucune', __FILE__), 'hex' => ''),
+            1 => array('couleur' => __('vert', __FILE__), 'hex' => '#31AA35'),
+            2 => array('couleur' => __('jaune', __FILE__), 'hex' => '#FFD600'),
+            3 => array('couleur' => __('orange', __FILE__), 'hex' => '#FF9800'),
+            4 => array('couleur' => __('rouge', __FILE__), 'hex' => '#E53935'),
         );
     }
 
@@ -168,6 +169,29 @@ class previsy_vigilance {
         }
         log::add('previsy', 'warning', 'previsy_vigilance::getZone :. ' . __('Département introuvable pour ', __FILE__) . $cle);
         return '';
+    }
+
+    // Noms des zones présentes dans le flux du pays (suggestions pour la saisie de la zone).
+    // Le flux ne contient que les zones ayant eu un message récemment : la liste peut être incomplète.
+    public static function getZonesConnues($_pays) {
+        if (!array_key_exists($_pays, self::getPays())) {
+            return array();
+        }
+        $feed = self::getFeed($_pays);
+        $zones = array();
+        if (is_object($feed) AND isset($feed->warnings)) {
+            foreach ($feed->warnings as $warning) {
+                foreach ((isset($warning->alert->info) ? $warning->alert->info : array()) as $info) {
+                    foreach ((isset($info->area) ? $info->area : array()) as $area) {
+                        if (!empty($area->areaDesc)) {
+                            $zones[self::normaliser($area->areaDesc)] = $area->areaDesc;
+                        }
+                    }
+                }
+            }
+        }
+        natcasesort($zones);
+        return array_values($zones);
     }
 
     public static function normaliser($_texte) {
