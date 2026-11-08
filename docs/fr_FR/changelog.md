@@ -10,6 +10,7 @@
 - NOUVEAU : Repli automatique sur l'autre API en cas d'indisponibilité, avec warning dans les logs, message dans le centre de messages, mention dans le widget et commande « API utilisée ». Retour automatique sur l'API choisie dès qu'elle répond.
 - NOUVEAU : Le cache est rechargé automatiquement quand l'API ou le lieu change.
 - BUG : Le niveau minimum de vigilance s'affichait vide sur un équipement existant ; les commandes « API utilisée » et « Type_degre » ne sont plus supprimables ; les cadres de vigilance et d'alertes personnalisées ne débordent plus du widget ; l'icône de rafraîchissement est de nouveau dans le bandeau de titre du widget.
+- BUG : Erreur « fputs(): Argument #1 ($stream) must be of type resource » dans la tâche planifiée quand le dossier data/json n'est pas accessible en écriture : les droits sont corrigés automatiquement, sinon le cache est enregistré dans le dossier temporaire de Jeedom, sans bloquer le plugin.
 - BUG : Un équipement défini uniquement par ses coordonnées n'était pas mis à jour à la sauvegarde.
 - BUG : Warning PHP dans le texte prédictif d'une alerte sans précipitation (vent, brouillard).
 - BUG : Les erreurs « ville introuvable » de prevision-meteo.ch n'étaient pas détectées.

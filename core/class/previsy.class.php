@@ -469,8 +469,8 @@ class previsy extends eqLogic {
     }
 
     public function preRemove() {
-        @unlink(self::$_jsonTampon . 'vigilance_zone_' . $this->getId() . '.json');
-        $tempJson = self::$_jsonTampon . $this->getId() . ".json";
+        @unlink(self::getDossierCache() . 'vigilance_zone_' . $this->getId() . '.json');
+        $tempJson = self::getDossierCache() . $this->getId() . ".json";
         if (is_file($tempJson)) {
             log::add('previsy', 'debug', '---------------------------------------------------------------------------------------');
             log::add('previsy', 'debug', __('preRemove :. ', __FILE__) . __('Suppression du fichier Json : ', __FILE__) . $tempJson);
@@ -1119,11 +1119,11 @@ class previsy extends eqLogic {
     public static function getJsonTampon($_id) {
 
         // La migration des anciens Json (core/json -> data/json) est faite une seule fois dans previsy_update()
-        $file = self::$_jsonTampon . $_id . ".json";
+        $file = self::getDossierCache() . $_id . ".json";
         $return["datas"] = is_file($file) ? json_decode(file_get_contents($file)) : NULL;
         $return["datetime"] = is_file($file) ? filemtime($file) : time();
         log::add('previsy', 'debug', '---------------------------------------------------------------------------------------');
-        log::add('previsy', 'debug', __('getJsonTampon :. ', __FILE__) . __('Chargement du Json : ', __FILE__) . self::$_jsonTampon . $_id . '.json');
+        log::add('previsy', 'debug', __('getJsonTampon :. ', __FILE__) . __('Chargement du Json : ', __FILE__) . self::getDossierCache() . $_id . '.json');
         return $return;
     }
 
@@ -1135,7 +1135,7 @@ class previsy extends eqLogic {
             return;
         }
 
-        $tempJson = self::$_jsonTampon . $_id . ".json";
+        $tempJson = self::getDossierCache() . $_id . ".json";
         $api = previsy_bridge::getLabel(previsy_bridge::getApi($eqLogic));
 
         // Rafraichir manuel : on recharge depuis l'API même si le cache est valide (sauf rechargement très récent)
@@ -1188,8 +1188,7 @@ class previsy extends eqLogic {
         self::prepareJsonFolder();
         $json = self::getInfoApi($_id);
         if($json != NULL){
-            self::createJsonFile(self::$_jsonTampon . $_id, $json);
-            return TRUE;
+            return self::createJsonFile(self::getDossierCache() . $_id, $json);
         } else {
             return FALSE;
         }
@@ -1205,12 +1204,36 @@ class previsy extends eqLogic {
         return previsy_bridge::fetch($eqLogic);
     }
 
-    public static function prepareJsonFolder() {
-        log::add('previsy', 'debug', 'prepareJsonFolder :. Lancement');
-        if (!is_dir(self::$_jsonTampon)) {
-            log::add('previsy', 'debug', 'prepareJsonFolder :.  Création du dossier :' . self::$_jsonTampon);
-            mkdir(self::$_jsonTampon, 0777);
+    // Dossier de cache des Json (prévisions, flux de vigilance...), accessible en écriture.
+    // 1) plugins/previsy/data/json/ ; 2) sinon tentative de correction des droits (sudo) ;
+    // 3) sinon dossier temporaire de Jeedom (le cache est alors perdu au redémarrage, ce qui est sans gravité).
+    public static function getDossierCache() {
+        static $memo = array();
+        $dossier = self::$_jsonTampon;
+        if (isset($memo[$dossier])) {
+            return $memo[$dossier];
         }
+        if (!is_dir($dossier)) {
+            @mkdir($dossier, 0775, true);
+        }
+        if (!is_writable($dossier) AND class_exists('system')) {
+            // Même principe que l'ancienne version (sudo chmod), mais limité au dossier data et sans 777
+            $data = escapeshellarg(dirname(rtrim($dossier, '/')));
+            exec(system::getCmdSudo() . 'chown -R ' . system::get('www-uid') . ':' . system::get('www-gid') . ' ' . $data . ' 2>&1');
+            exec(system::getCmdSudo() . 'chmod -R ug+rwX ' . $data . ' 2>&1');
+            clearstatcache();
+        }
+        if (is_dir($dossier) AND is_writable($dossier)) {
+            return $memo[$dossier] = $dossier;
+        }
+        $tmp = rtrim(jeedom::getTmpFolder('previsy'), '/') . '/';
+        log::add('previsy', 'error', __('Le dossier', __FILE__) . ' ' . $dossier . ' ' . __('n\'est pas accessible en écriture : le cache est enregistré dans', __FILE__) . ' ' . $tmp . '. '
+                . __('Pour corriger, vérifiez les droits du dossier plugins/previsy/data (propriétaire', __FILE__) . ' ' . (class_exists('system') ? system::get('www-uid') : 'www-data') . ').');
+        return $memo[$dossier] = $tmp;
+    }
+
+    public static function prepareJsonFolder() {
+        return self::getDossierCache();
     }
 
     public static function getJson($_file) {
@@ -1226,19 +1249,21 @@ class previsy extends eqLogic {
         }
     }
 
+    // Écrit le Json (fichier temporaire puis renommage). Retourne FALSE si l'écriture est impossible, sans interrompre le cron.
     public static function createJsonFile($_file, $_data) {
         log::add('previsy', 'debug', __('createJsonFile :. ', __FILE__) . __('Enregistrement du Json : ', __FILE__) . $_file);
 
-        $fichier = fopen($_file . '.temp', 'w');
-        fputs($fichier, json_encode($_data));
-        fclose($fichier);
-        
-        if(is_file($_file . '.json')){
-            unlink($_file . '.json');
+        if (@file_put_contents($_file . '.temp', json_encode($_data)) === false) {
+            log::add('previsy', 'error', __('createJsonFile :. ', __FILE__) . __('Impossible d\'écrire le fichier', __FILE__) . ' ' . $_file . '.temp');
+            return FALSE;
         }
-        
-        rename($_file . '.temp', $_file . '.json');
-        chmod($_file . '.json', 0777);
+        if (!@rename($_file . '.temp', $_file . '.json')) {
+            @unlink($_file . '.temp');
+            log::add('previsy', 'error', __('createJsonFile :. ', __FILE__) . __('Impossible d\'écrire le fichier', __FILE__) . ' ' . $_file . '.json');
+            return FALSE;
+        }
+        @chmod($_file . '.json', 0664);
+        return TRUE;
     }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -115,7 +115,7 @@ class previsy_vigilance {
 
     // Flux MeteoAlarm d'un pays (cache fichier partagé par tous les équipements)
     public static function getFeed($_pays) {
-        $file = previsy::$_jsonTampon . 'meteoalarm_' . $_pays . '.json';
+        $file = previsy::getDossierCache() . 'meteoalarm_' . $_pays . '.json';
         if (is_file($file) AND (time() - filemtime($file)) < self::$_cacheFeed) {
             $json = json_decode(file_get_contents($file));
             if (is_object($json)) {
@@ -124,9 +124,9 @@ class previsy_vigilance {
         }
         $json = previsy_bridge::httpGetJson(self::$_urlFeed . $_pays, 20);
         if (is_object($json) AND isset($json->warnings)) {
-            previsy::prepareJsonFolder();
-            file_put_contents($file . '.temp', json_encode($json));
-            rename($file . '.temp', $file);
+            if (@file_put_contents($file . '.temp', json_encode($json)) !== false) {
+                @rename($file . '.temp', $file);
+            }
             return $json;
         }
         // MeteoAlarm injoignable : on se contente du dernier flux connu
@@ -153,7 +153,7 @@ class previsy_vigilance {
 
         // Cache par équipement et par position
         $cle = round($lat, 3) . ',' . round($lon, 3);
-        $file = previsy::$_jsonTampon . 'vigilance_zone_' . $_eqLogic->getId() . '.json';
+        $file = previsy::getDossierCache() . 'vigilance_zone_' . $_eqLogic->getId() . '.json';
         $cache = is_file($file) ? json_decode(file_get_contents($file), true) : NULL;
         if (isset($cache['cle'], $cache['zone']) AND $cache['cle'] == $cle) {
             return $cache['zone'];
@@ -162,8 +162,7 @@ class previsy_vigilance {
         $geo = previsy_bridge::httpGetJson(self::$_urlGeoGouv . '?lat=' . $lat . '&lon=' . $lon . '&fields=departement&format=json', 15, TRUE);
         if (is_array($geo) AND isset($geo[0]->departement->nom)) {
             $zone = $geo[0]->departement->nom;
-            previsy::prepareJsonFolder();
-            file_put_contents($file, json_encode(array('cle' => $cle, 'zone' => $zone)));
+            @file_put_contents($file, json_encode(array('cle' => $cle, 'zone' => $zone)));
             log::add('previsy', 'debug', 'previsy_vigilance::getZone :. ' . $cle . ' -> ' . $zone);
             return $zone;
         }

@@ -262,7 +262,11 @@
         "Aucune donnée (équipement désactivé ?) #ID# ": "No data (disabled equipment?) #ID# ",
         "repli": "fallback",
         "indisponible : données": "unavailable: data from",
-        "API utilisée": "API used"
+        "API utilisée": "API used",
+        "Le dossier": "The folder",
+        "n'est pas accessible en écriture : le cache est enregistré dans": "is not writable: the cache is stored in",
+        "Pour corriger, vérifiez les droits du dossier plugins/previsy/data (propriétaire": "To fix it, check the permissions of the plugins/previsy/data folder (owner",
+        "Impossible d'écrire le fichier": "Unable to write the file"
     },
     "plugins\/previsy\/core\/class\/previsy.class.phrases.php": {
         " à": " at",
