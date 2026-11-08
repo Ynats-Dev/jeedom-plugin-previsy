@@ -6,7 +6,7 @@ lang: en_US
 Description
 ===
 
-This plugin announces the next weather alerts (72H) in France, Belgium and Switzerland. Previsy also builds sentences that can be used to be sent to you by sms, announced by your home or slack etc...
+This plugin announces the next weather alerts (72H), worldwide with Open-Meteo or in France, Belgium and Switzerland with prevision-meteo.ch. Previsy also builds sentences that can be used to be sent to you by sms, announced by your home or slack etc...
 
 ## Examples of use
 
@@ -39,9 +39,52 @@ You will, of course, be able to retrieve the raw data to create your scenarios a
 Installation
 ===
 
-## The plugin uses prevision-meteo.ch forecast 
+## Choosing the weather API
 
-Prevision-meteo.ch is very regularly saturated. To overcome this problem, Previsy caches the API data and uses it to refresh the widgets if the API is unavailable or too long to respond.
+Previsy can use one of the following APIs:
+
+| API | Coverage | API key |
+| --- | --- | --- |
+| [Open-Meteo](https://open-meteo.com) | Worldwide | No |
+| [prevision-meteo.ch](https://www.prevision-meteo.ch) | France, Belgium, Switzerland | No |
+
+The choice is made in the **plugin configuration** ("Weather API" field):
+- **Open-Meteo** or **prevision-meteo.ch**: all equipments use this API. Changing this setting switches all equipments at once;
+- **Choice per equipment**: each equipment chooses its API in its own page.
+
+### Which API should I choose?
+
+**Open-Meteo is recommended** (it is the setting of a new installation):
+- it covers the whole world and finds any town, while prevision-meteo.ch only knows its own list of cities;
+- it is more available: prevision-meteo.ch is regularly saturated;
+- it provides all the data used by custom alerts (wind, gusts, direction, feels-like temperature, humidity, pressure...).
+
+With Open-Meteo, the city is found automatically (geocoding). If several towns share the same name, fill in the coordinates instead: they always take precedence.
+
+### Automatic fallback when an API is unavailable
+
+With the **Automatic fallback to the other API** option (enabled by default), if the chosen API does not respond (outage, saturation, quota exceeded), Previsy gets the forecast from the other API. In that case:
+- a **warning** is written in the plugin logs at each attempt;
+- a **message** is added to the Jeedom message center (only once, as long as the API stays unavailable);
+- the widget displays "*API* unavailable: *other API* data" and the **API utilisée** command shows "(repli)";
+- the chosen API is tried again at each update (every hour). As soon as it responds, Previsy goes back to it and the message disappears.
+
+If the other API cannot find the location (for example a city missing from the prevision-meteo.ch list), the fallback is not used and the last cached data is kept. For a reliable fallback, fill in coordinates: both APIs accept them.
+
+A configuration error (city not found on the chosen API) does not trigger a fallback: it is displayed in the widget so that you can fix it.
+
+### After updating the plugin
+
+When updating, the plugin switches to **Choice per equipment** and existing equipments **stay on prevision-meteo.ch**: their behaviour does not change. To switch everything to Open-Meteo:
+1. in the plugin configuration, choose "Open-Meteo" in **Weather API** and save;
+2. each equipment's forecast is reloaded at the next update (within one hour), or immediately with the Rafraichir command;
+3. check in the commands (or the widget) that the location and the alerts suit you.
+
+> Both APIs do not describe the weather in exactly the same way: after switching, the same situation may produce slightly different alerts (for example drizzle reported as "light rain"). Remember to check the scenarios that use Previsy commands.
+
+### Cache
+
+Previsy caches the API data (2 hours) and uses it to refresh the widgets if the API is unavailable or too long to respond. The cache is reloaded automatically when you change the API or the location.
 
 
 ## Configuration
@@ -64,6 +107,12 @@ Data allowing you to create your custom scenarios. You just have to check the co
 **Warning**
 > If you want to display 5 alerts and all the commands you will get a lot of them! 
 
+### Weather API
+The API used by all equipments (Open-Meteo, prevision-meteo.ch), or "Choice per equipment". See the "Choosing the weather API" section.
+
+### Automatic fallback to the other API
+If the chosen API is unavailable, Previsy uses the other API and warns you (logs, message center, widget). See the "Choosing the weather API" section.
+
 ### Scheduled task (cron)
 If you disable the scheduled task that takes place every hour ... the plugin will be useless ...
 
@@ -76,19 +125,24 @@ Management
 
 ![previsy5](../images/parametre-1.png)
 
-### City
-Here you enter the name of the city you wish to survey. To allow you to test, a button will be displayed on the right of the entry to test directly on the site prevision-meteo.ch
-If the site is offline or takes a long time to answer, you will have to try again later.
+### Weather API
+This field only appears in "Choice per equipment" mode (plugin configuration): Open-Meteo (recommended) or prevision-meteo.ch. Otherwise, the API defined for all equipments is simply shown.
 
-> In the url the keyword of the city: https://www.prevision-meteo.ch/meteo/localite/yourcity
+### City
+Here you enter the name of the city you wish to survey. The input is automatically converted to lower case without accents (e.g. "Le Havre" becomes "le-havre").
+
+- **Open-Meteo**: the city is found automatically. If several towns share the same name, use the coordinates.
+- **prevision-meteo.ch**: a button is displayed on the right of the entry to test the city directly on the website. If the site is offline or takes a long time to answer, you will have to try again later.
+
+> In the prevision-meteo.ch url, the keyword of the city: https://www.prevision-meteo.ch/meteo/localite/yourcity
 
 ![previsy6](../images/parametre-saisie.png)
 
 ### Coordinates of the localisation
 
-Fill in the latitude and longitude of the location you wish to survey. If you enter coordinates, the city will not be taken into account.
+Fill in the latitude and longitude of the location you wish to survey, in decimal degrees (e.g. 48.39 and -4.49 for Brest: longitudes west of Greenwich and latitudes of the southern hemisphere are negative). If you enter coordinates, the city will not be taken into account.
 
-> In the url the coordinates: https://www.prevision-meteo.ch/meteo/localite/lat=01.500lng=65.100
+> To test on prevision-meteo.ch: https://www.prevision-meteo.ch/meteo/localite/lat=48.390lng=-4.490
 
 ### Display predictive text in the widget
 
@@ -101,7 +155,60 @@ Weather warnings (rain, snow, etc...) have priority over wind warnings.
 
 ![previsy8](../images/parametre-vent.png)
 
-You can set the wind threshold according to the locality. The "wind" alert will not be triggered below this threshold.
+You can set the wind threshold according to the locality. The "wind" alert will not be triggered below this threshold. Choose "No wind alert" to never receive it.
+
+### Disable standard weather alerts
+
+Tick this box to stop receiving the standard alerts (rain, snow, thunderstorm, fog). Useful if you only use your own alerts or the weather warnings.
+
+## My alerts (custom alerts)
+
+In the **My alerts** tab, create as many alerts as you want (up to 20 per equipment). An alert is triggered on the hours when **all the conditions you filled in** are true; empty fields are ignored.
+
+| Condition | Description |
+| --- | --- |
+| Rain / Snow | Any, Yes (it rains / it snows) or No (it does not rain / it does not snow) |
+| Wind direction | One or more directions the wind comes from (N, NE, E, SE, S, SO = SW, O = W, NO = NW). No box ticked = all |
+| Average wind, gusts | Minimum and/or maximum values in km/h |
+| Temperature, feels-like temperature | Minimum and/or maximum values |
+| Humidity, pressure | Minimum and/or maximum values (% and hPa) |
+| Time range | Start and end hours (0 to 23). A 22 → 6 range goes past midnight |
+| Minimum duration | Number of consecutive hours required to keep a period |
+
+Examples:
+- **Sailing**: no rain, wind between 20 and 40 km/h from the West or South-West, between 10am and 6pm, for at least 3 hours.
+- **Frost**: maximum temperature 0 °C.
+- **No need to water**: rain = Yes, for at least 2 hours.
+
+Each alert creates its own commands, named after the alert (e.g. "Sailing - In progress"):
+
+| Type | Command | Description |
+| --- | --- | --- |
+| binary info | *Name* - In progress | 1 if the period has started |
+| numeric info | *Name* - In (hours) | Number of hours before the next period |
+| numeric info | *Name* - Start / End | Start and end of the next period (YYYYMMDDHHMM format) |
+| numeric info | *Name* - Duration | Duration of the next period in hours |
+| numeric info | *Name* - Number of periods | Number of periods found within 72 hours |
+| string info | *Name* - Text | Ready-to-send sentence, followed by your message |
+
+## National weather warnings
+
+In the **Warning** tab, Previsy can report the official weather warnings (Météo-France, RMI, MeteoSwiss...) published by [MeteoAlarm](https://meteoalarm.org), without API key: violent wind, rain-flood, flooding, thunderstorms, snow-ice, heat wave, extreme cold, avalanches, waves-submersion...
+
+- **Country**: France, Belgium, Switzerland, Luxembourg and other European countries.
+- **Area**: in France, leave it empty, the department is found automatically from the city or the coordinates. Elsewhere, enter the region name as shown on meteoalarm.org.
+- **Minimum level**: yellow, orange or red.
+
+The warning is displayed as a coloured banner at the top of the widget and in the following commands:
+
+| Type | Command | Description |
+| --- | --- | --- |
+| numeric info | Warning level | 0 = none, 2 = yellow, 3 = orange, 4 = red (historized) |
+| string info | Warning colour | none, yellow, orange or red (values in French: aucune, jaune, orange, rouge) |
+| binary info | Warning in progress | 1 if the warning has started (0 if it is only announced) |
+| string info | Warning text | E.g. "Vigilance orange pluie-inondation (Gard) jusqu'au 05/11/2026 00:00." |
+| string info | Warning area | Area used (detected or entered department) |
+| numeric info | Warning start / end | Period covered (YYYYMMDDHHMM format) |
 
 ## Controls
 
@@ -114,11 +221,12 @@ You can set the wind threshold according to the locality. The "wind" alert will 
 | Type | Control | Description |
 | ------------ | ------------ | ------------ | 
 | info | SynchroVille | This corresponds to the city you have registered. |
-| info | SynchroLastUpDate | Date in "timestamp" format of the last synchronization with the website prevision-meteo.ch. | 
+| info | SynchroLastUpDate | Date in "timestamp" format of the last synchronization with the weather API. | 
 | info | Latitude | As its name indicates | 
 | info | Longitude | As its name indicates | 
 | info | Type_degre | °C ou °F | 
-| action | Rafraichir | The famous command to refresh the widget. This will launch a synchro at prevision-meteo.ch. | 
+| info | API utilisée | API that provided the latest forecast, followed by "(repli)" if the chosen API was unavailable. | 
+| action | Rafraichir | The famous command to refresh the widget. This will launch a synchronization with the chosen weather API (if the cache has expired). | 
 
 ### Controls related to alerts
 

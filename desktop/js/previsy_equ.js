@@ -12,7 +12,9 @@ function previsyNormalizer(str) {
   }
   var final = str.join('').toLowerCase();
   
-  if(final !== ''){
+  // Lien de test uniquement pour prevision-meteo.ch (Open-Meteo trouve la ville par géocodage)
+  var previsyApi = (typeof previsyApiGlobale !== 'undefined' && previsyApiGlobale !== '') ? previsyApiGlobale : $('#previsyApi').val();
+  if(final !== '' && previsyApi === 'prevision_meteo_ch'){
       $( "#previsyLinkVille" ).replaceWith('<a class="btn btn-sm btn-default" id="previsyLinkVille" href="https://www.prevision-meteo.ch/meteo/localite/'+final+'" target="_blank">{{Testez la ville de }}<b>'+final+'</b> {{sur}} prevision-meteo.ch</a>');
   } else {
       $( "#previsyLinkVille" ).replaceWith('<span id="previsyLinkVille"></span>');

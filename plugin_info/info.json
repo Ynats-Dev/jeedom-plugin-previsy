@@ -2,8 +2,8 @@
 	"id" : "previsy",
 	"name" : "Previsy",
 	"description" : {
-		"fr_FR": "Ce plugin annonce les prochaines prévisions en alerte météo (72H) en France, Belgique et Suisse. Previsy construit également des phrases qui peuvent être utilisées pour vous être envoyées par sms, annoncées par votre home ou slack etc… Par ailleurs, vous avez également la possibilité d'utiliser les données brutes pour vous créer des scénarios sur mesure.",
-		"en_US": "This plugin announces the next forecasts in weather alert (72H) in France, Belgium and Switzerland. Previsy also builds sentences that can be used to be sent to you by sms, announced by your home or slack etc... Moreover, you also have the possibility to use the raw data to create custom scenarios."
+		"fr_FR": "Ce plugin annonce les prochaines prévisions en alerte météo (72H), partout dans le monde avec Open-Meteo ou en France, Belgique et Suisse avec prevision-meteo.ch. Previsy construit également des phrases qui peuvent être utilisées pour vous être envoyées par sms, annoncées par votre home ou slack etc… Par ailleurs, vous avez également la possibilité d'utiliser les données brutes pour vous créer des scénarios sur mesure.",
+		"en_US": "This plugin announces the next forecasts in weather alert (72H), worldwide with Open-Meteo or in France, Belgium and Switzerland with prevision-meteo.ch. Previsy also builds sentences that can be used to be sent to you by sms, announced by your home or slack etc... Moreover, you also have the possibility to use the raw data to create custom scenarios."
 	},
 	"licence" : "AGPL",
 	"author" : "Ynats",

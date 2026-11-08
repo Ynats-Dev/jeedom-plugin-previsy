@@ -2,9 +2,13 @@
 if (!isConnect('admin')) {
     throw new Exception('{{401 - Accès non autorisé}}');
 }
+require_once __DIR__ . '/../../core/class/bridges/previsy.bridge.php';
+require_once __DIR__ . '/../../core/class/previsy.vigilance.php';
 $plugin = plugin::byId('previsy');
 sendVarToJS('eqType', $plugin->getId());
 $eqLogics = eqLogic::byType($plugin->getId());
+// API imposée par la configuration globale (vide si chaque équipement choisit la sienne)
+sendVarToJS('previsyApiGlobale', (previsy_bridge::getMode() == previsy_bridge::MODE_EQUIPEMENT) ? '' : previsy_bridge::getMode());
 ?>
 
 <div class="row row-overflow">
@@ -54,6 +58,8 @@ $eqLogics = eqLogic::byType($plugin->getId());
         <ul class="nav nav-tabs" role="tablist">
             <li role="presentation"><a href="#" class="eqLogicAction" aria-controls="home" role="tab" data-toggle="tab" data-action="returnToThumbnailDisplay"><i class="fa fa-arrow-circle-left"></i></a></li>
             <li role="presentation" class="active"><a href="#eqlogictab" aria-controls="home" role="tab" data-toggle="tab"><i class="fas fa-tachometer-alt"></i> {{Equipement}}</a></li>
+            <li role="presentation"><a href="#alertestab" aria-controls="profile" role="tab" data-toggle="tab"><i class="fas fa-bell"></i> {{Mes alertes}}</a></li>
+            <li role="presentation"><a href="#vigilancetab" aria-controls="profile" role="tab" data-toggle="tab"><i class="fas fa-exclamation-triangle"></i> {{Vigilance}}</a></li>
             <li role="presentation"><a href="#commandtab" aria-controls="profile" role="tab" data-toggle="tab"><i class="fa fa-list-alt"></i> {{Commandes}}</a></li>
         </ul>
         <div class="tab-content" style="height:calc(100% - 50px);overflow:auto;overflow-x: hidden;">
@@ -101,6 +107,28 @@ $eqLogics = eqLogic::byType($plugin->getId());
                             </div>
                         </div>
                         <div class="form-group" style="margin-top: 15px;">
+                            <label class="col-sm-3 control-label">{{API météo}}
+                                <sup><i class="fas fa-question-circle tooltips" title="{{Open-Meteo couvre le monde entier, gratuitement et sans clé. prevision-meteo.ch couvre la France, la Belgique et la Suisse.}}"></i></sup>
+                            </label>
+                            <?php if (previsy_bridge::getMode() == previsy_bridge::MODE_EQUIPEMENT) { ?>
+                            <div class="col-sm-3">
+                                <select class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="api" id="previsyApi" onchange="previsyNormalizer($('.previsyVille').val() || '');">
+                                    <?php
+                                    foreach (previsy_bridge::getList() as $apiId => $apiClass) {
+                                        echo '<option value="' . $apiId . '">' . $apiClass::getLabel() . '</option>';
+                                    }
+                                    ?>
+                                </select>
+                            </div>
+                            <?php } else { ?>
+                            <div class="col-sm-6" style="padding-top:7px;">
+                                <span class="label label-info"><?php echo previsy_bridge::getLabel(previsy_bridge::getMode()); ?></span>
+                                {{définie pour tous les équipements dans la configuration du plugin}}
+                                <?php if (previsy_bridge::repliActif()) { echo '{{(repli automatique activé)}}'; } ?>
+                            </div>
+                            <?php } ?>
+                        </div>
+                        <div class="form-group" style="margin-top: 15px;">
                             <label class="col-sm-3 control-label">{{Nom de la ville}}</label>
                             <div class="col-sm-3">
                                 <input type="text" onkeyup="this.value=previsyNormalizer(this.value);" onfocus="this.value=previsyNormalizer(this.value);" class="eqLogicAttr form-control previsyVille" data-l1key="configuration" data-l2key="ville" placeholder="ville" />
@@ -113,10 +141,10 @@ $eqLogics = eqLogic::byType($plugin->getId());
                         <div class="form-group" style="margin-top: 15px;">
                             <label class="col-sm-3 control-label">{{Coordonnées du point (prend le dessus sur la ville)}}</label>
                             <div class="col-sm-3">
-                                <input type="text" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="latitude" placeholder="latitude" oninput="this.value = this.value.replace(/[^0-9.-]/g, '').replace(/(\..*)\./g, '$1');" />
+                                <input type="text" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="latitude" placeholder="latitude" oninput="this.value = this.value.replace(/[^0-9.-]/g, '').replace(/(?!^)-/g, '').replace(/(\..*)\./g, '$1');" />
                             </div>
                             <div class="col-sm-3">
-                                <input type="text" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="longitude" placeholder="longitude" oninput="this.value = this.value.replace(/[^0-9.-]/g, '').replace(/(\..*)\./g, '$1');" />
+                                <input type="text" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="longitude" placeholder="longitude" oninput="this.value = this.value.replace(/[^0-9.-]/g, '').replace(/(?!^)-/g, '').replace(/(\..*)\./g, '$1');" />
                             </div>
                             <div><a href="" target="_blank"></a></div>
                         </div>
@@ -145,6 +173,64 @@ $eqLogics = eqLogic::byType($plugin->getId());
                                     <option value="89">{{[Force 10] Moyenne du vent à partir de 89 km/h (Tempête)}}</option>
                                     <option value="103">{{[Force 11] Moyenne du vent à partir de 103 km/h (Violente tempête)}}</option>
                                     <option value="118">{{[Force 12] Moyenne du vent à partir de 118 km/h (Ouragan)}}</option>
+                                    <option value="">{{Aucune alerte liée au vent}}</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group" style="margin-top: 15px;">
+                            <label class="col-sm-3 control-label">{{Désactiver les alertes météo standards}}
+                                <sup><i class="fas fa-question-circle tooltips" title="{{Pluie, neige, orage et brouillard. Utile si vous ne voulez que vos propres alertes (onglet Mes alertes) ou la vigilance.}}"></i></sup>
+                            </label>
+                            <div class="col-sm-3">
+                                <input type="checkbox" class="eqLogicAttr checkbox-inline" data-l1key="configuration" data-l2key="desactiveAlertesMeteo" />
+                            </div>
+                        </div>
+                    </fieldset>
+                </form>
+            </div>
+            <div role="tabpanel" class="tab-pane" id="alertestab">
+                <br/>
+                <div class="alert alert-info">
+                    {{Créez vos propres alertes en combinant des conditions : toutes celles que vous renseignez doivent être vraies en même temps (ex. vent du Sud-Ouest entre 20 et 40 km/h, sans pluie, entre 10h et 18h). Les champs vides sont ignorés. Chaque alerte crée ses propres commandes (en cours, dans combien d'heures, début, fin, durée, texte) utilisables dans vos scénarios.}}
+                </div>
+                <a class="btn btn-success btn-sm" id="bt_previsyAddRegle"><i class="fas fa-plus-circle"></i> {{Ajouter une alerte}}</a>
+                <br/><br/>
+                <div id="div_previsyRegles"></div>
+            </div>
+            <div role="tabpanel" class="tab-pane" id="vigilancetab">
+                <br/>
+                <div class="alert alert-info">
+                    {{Vigilances officielles (Météo-France, IRM, MétéoSuisse...) diffusées par}} <a href="https://meteoalarm.org" target="_blank">MeteoAlarm</a>.
+                    {{En France, laissez la zone vide : le département est trouvé automatiquement depuis la ville ou les coordonnées. Pour les autres pays, saisissez le nom de la région tel qu'il apparaît sur meteoalarm.org.}}
+                </div>
+                <form class="form-horizontal">
+                    <fieldset>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">{{Pays}}</label>
+                            <div class="col-sm-3">
+                                <select class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="vigilancePays">
+                                    <option value="">{{Vigilance désactivée}}</option>
+                                    <?php
+                                    foreach (previsy_vigilance::getPays() as $paysId => $paysNom) {
+                                        echo '<option value="' . $paysId . '">' . $paysNom . '</option>';
+                                    }
+                                    ?>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">{{Zone (département, région...)}}</label>
+                            <div class="col-sm-3">
+                                <input type="text" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="vigilanceZone" placeholder="{{Automatique (France)}}"/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">{{Niveau minimum}}</label>
+                            <div class="col-sm-3">
+                                <select class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="vigilanceNiveauMin">
+                                    <option value="2">{{Jaune et plus}}</option>
+                                    <option value="3">{{Orange et plus}}</option>
+                                    <option value="4">{{Rouge uniquement}}</option>
                                 </select>
                             </div>
                         </div>

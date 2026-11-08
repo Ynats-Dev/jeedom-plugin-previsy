@@ -1,3 +1,25 @@
+# 08/11/2026 | Beta 1.1.0
+- NOUVEAU : Alertes personnalisées (onglet « Mes alertes ») : combinez pluie, neige, vent, rafales, direction du vent, température, température ressentie, humidité, pression, plage horaire et durée minimale. Chaque alerte a ses propres commandes.
+- NOUVEAU : Vigilance météo nationale via MeteoAlarm (Météo-France, IRM, MétéoSuisse...) : bandeau dans le widget et commandes dédiées. En France, le département est détecté automatiquement.
+- NOUVEAU : Possibilité de désactiver les alertes météo standards et l'alerte vent.
+- BUG : Un équipement défini uniquement par ses coordonnées n'était pas mis à jour à la sauvegarde.
+- NOUVEAU : Choix de l'API météo dans la configuration du plugin, pour tous les équipements d'un coup : Open-Meteo (monde entier, sans clé, recommandé) ou prevision-meteo.ch, ou choix par équipement. Une mise à jour conserve le fonctionnement actuel (choix par équipement, équipements existants sur prevision-meteo.ch). Architecture « bridge » pour ajouter d'autres API.
+- NOUVEAU : Repli automatique sur l'autre API en cas d'indisponibilité, avec warning dans les logs, message dans le centre de messages, mention dans le widget et commande « API utilisée ». Retour automatique sur l'API choisie dès qu'elle répond.
+- BUG : Warning PHP dans le texte prédictif d'une alerte sans précipitation (vent, brouillard).
+- NOUVEAU : Le cache est rechargé automatiquement quand l'API ou le lieu change.
+- BUG : Les erreurs « ville introuvable » de prevision-meteo.ch n'étaient pas détectées.
+- BUG : Les coordonnées négatives (longitude Ouest, hémisphère Sud) ne pouvaient pas être saisies.
+- BUG : Le total de précipitations est arrondi.
+- BUG : Le widget n'affiche plus « 0 mm » quand l'alerte n'a pas de précipitation (alerte vent).
+- BUG : Les valeurs à 0 (0 °C, vent nul, 0 mm) n'étaient plus prises en compte et faussaient les min / max / moyennes.
+- BUG : Une valeur absente s'affiche « – » au lieu de « 0.0 ».
+- BUG : La sauvegarde d'un équipement n'est plus interrompue (suppression d'un ajax::success dans postSave).
+- BUG : Pas d'alerte vent si aucun seuil n'est configuré ou si la donnée de vent est absente.
+- BUG : Échelle de Beaufort : 118 km/h est bien classé « ouragan ».
+- Timeout de 15 s sur l'appel à prevision-meteo.ch pour ne plus bloquer le cron.
+- Suppression des commandes sudo exécutées à chaque mise à jour (migration faite uniquement à la mise à jour du plugin).
+- Compatibilité PHP 8 (warnings et dépréciations).
+
 # 19/10/2020 | beta 1.0.4 (Par Piug)
 - Ajout de la traduction en Anglais
 - Ajout d'une courte description des commandes dans la configuration

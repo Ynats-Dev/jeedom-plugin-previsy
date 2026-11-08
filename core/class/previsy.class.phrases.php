@@ -155,7 +155,7 @@ class previsy_language {
             return __('tempête',  __FILE__);
         } elseif ($_input >= 103 AND $_input < 118) {
             return __('violente tempête',  __FILE__);
-        } elseif ($_input > 118) {
+        } elseif ($_input >= 118) {
             return __('ouragan',  __FILE__);
         }
     }
@@ -226,7 +226,7 @@ class previsy_language {
         
         $return["MM"] = NULL;
         
-        if($_input["MM"]["TOTAL"] > 0){
+        if(!empty($_input["MM"]["TOTAL"]) AND $_input["MM"]["TOTAL"] > 0){ // MM vaut NULL pour une alerte sans précipitation (vent, brouillard)
             $return["MM"] .= __("Il y aura un total de ",  __FILE__) . number_format(@$_input["MM"]["TOTAL"], 1) . __(" millimètre",  __FILE__);
             if ($_input["MM"]["TOTAL"] > 1) {
                 $return["MM"] .= "s";
