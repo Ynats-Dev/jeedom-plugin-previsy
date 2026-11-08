@@ -43,6 +43,31 @@ if (!isConnect()) {
     <fieldset>
         <br />
         <div class="form-group">
+            <label class="col-lg-4 control-label">{{API météo}}
+                <sup><i class="fas fa-question-circle tooltips" title="{{L'API utilisée par tous les équipements. Open-Meteo (recommandé) couvre le monde entier ; prevision-meteo.ch couvre la France, la Belgique et la Suisse. « Choix par équipement » laisse chaque équipement choisir son API.}}"></i></sup>
+            </label>
+            <div class="col-lg-2">
+                <select class="configKey form-control" data-l1key="api_mode">
+                    <?php
+                    require_once __DIR__ . '/../core/class/bridges/previsy.bridge.php';
+                    foreach (previsy_bridge::getList() as $apiId => $apiClass) {
+                        echo '<option value="' . $apiId . '">' . $apiClass::getLabel() . '</option>';
+                    }
+                    ?>
+                    <option value="equipement">{{Choix par équipement}}</option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-4 control-label">{{Repli automatique sur l'autre API}}
+                <sup><i class="fas fa-question-circle tooltips" title="{{Si l'API choisie ne répond pas (panne, saturation, quota), Previsy utilise l'autre API. Un warning est écrit dans les logs et un message est ajouté au centre de messages. L'API choisie est retentée à chaque mise à jour.}}"></i></sup>
+            </label>
+            <div class="col-lg-2">
+                <input type="checkbox" class="configKey" data-l1key="api_repli" />
+            </div>
+        </div>
+        <br />
+        <div class="form-group">
             <label class="col-lg-4 control-label">{{Nombre d'alerte en prévision à afficher}}</label>
             <div class="col-lg-2">
                 <select class="configKey form-control" id="previsy_select" onchange="previsy_cpt()" data-l1key="nb_alerte">
