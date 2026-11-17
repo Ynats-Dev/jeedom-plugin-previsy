@@ -1,3 +1,11 @@
+# 11/17/2026 | Beta 2.0.1
+- NEW: Choice of the Open-Meteo model in the configuration. Default "Automatic": Météo-France models (AROME, 1.3 km grid) in France and neighbouring countries, best global model elsewhere. More reliable forecasts, especially for showers.
+- NEW: Minimum rain for an alert (0.2 mm/h by default): unreliable traces of rain or snow no longer raise a standard alert.
+- NEW: Minimum rain probability for an alert (30% by default, Open-Meteo only): an unlikely hour of rain or snow no longer raises a standard alert. With the Météo-France model, which provides no probability, the one from the best global model is used.
+- BUG: Open-Meteo: a "rain" alert could be raised for hours without precipitation (precipitation "None").
+- BUG: A "0" was displayed under the widget when there was only one alert.
+- BUG: The bottom of the widget was stuck to, or even cut off below, the last alert.
+
 # 11/08/2026 | Beta 2.0.0
 - NEW: Widget for the mobile app.
 - NEW: The Rafraichir command really reloads the forecast from the API (at most once every 5 minutes).

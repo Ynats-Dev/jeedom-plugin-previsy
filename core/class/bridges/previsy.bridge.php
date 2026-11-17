@@ -36,6 +36,7 @@
 #           "RH2m"          : humidité (%)
 #           "PRMSL"         : pression au niveau de la mer (hPa)
 #           "APCPsfc"       : précipitations (mm)
+#           "PROBA"         : probabilité de précipitation (%), NULL si l'API ne la fournit pas
 #           "ISSNOW"        : 1 si neige
 #           "WNDSPD10m"     : vent moyen (km/h)
 #           "WNDGUST10m"    : rafales (km/h)
@@ -75,6 +76,20 @@ class previsy_bridge {
         $mode = config::byKey('api_mode', 'previsy', self::MODE_EQUIPEMENT);
         $list = self::getList();
         return isset($list[$mode]) ? $mode : self::MODE_EQUIPEMENT;
+    }
+
+    // Précipitations minimales (mm sur l'heure) pour qu'une heure de pluie ou de neige lève une alerte standard
+    const SEUIL_PLUIE_DEFAUT = 0.2;
+    public static function getSeuilPluie() {
+        $seuil = str_replace(',', '.', trim(config::byKey('seuil_pluie', 'previsy', self::SEUIL_PLUIE_DEFAUT)));
+        return (is_numeric($seuil) AND floatval($seuil) >= 0) ? floatval($seuil) : self::SEUIL_PLUIE_DEFAUT;
+    }
+
+    // Probabilité de précipitation minimale (%) pour qu'une heure de pluie ou de neige lève une alerte standard (0 = désactivé)
+    const PROBA_PLUIE_DEFAUT = 30;
+    public static function getProbaPluie() {
+        $proba = trim(config::byKey('proba_pluie', 'previsy', self::PROBA_PLUIE_DEFAUT));
+        return (is_numeric($proba) AND floatval($proba) >= 0 AND floatval($proba) <= 100) ? floatval($proba) : self::PROBA_PLUIE_DEFAUT;
     }
 
     // Repli automatique sur l'autre API en cas d'indisponibilité (activé par défaut)
@@ -193,7 +208,10 @@ class previsy_bridge {
 
     // Identifie "API + lieu" pour savoir si le cache Json correspond toujours à la configuration
     public static function getSourceKey($_eqLogic) {
-        return self::getApi($_eqLogic) . '|' . trim($_eqLogic->getConfiguration('ville')) . '|' . trim($_eqLogic->getConfiguration('latitude')) . '|' . trim($_eqLogic->getConfiguration('longitude'));
+        $api = self::getApi($_eqLogic);
+        // Le modèle Open-Meteo fait partie de la source : en changer recharge les prévisions
+        $modele = ($api == 'open_meteo') ? '|' . previsy_bridge_open_meteo::getModeleConfig() : '';
+        return $api . $modele . '|' . trim($_eqLogic->getConfiguration('ville')) . '|' . trim($_eqLogic->getConfiguration('latitude')) . '|' . trim($_eqLogic->getConfiguration('longitude'));
     }
 
     // Lieu de l'équipement : les coordonnées prennent le dessus sur la ville

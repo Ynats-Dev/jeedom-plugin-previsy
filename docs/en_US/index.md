@@ -121,6 +121,15 @@ The API used by all equipments (Open-Meteo, prevision-meteo.ch), or "Choice per 
 ### Automatic fallback to the other API
 If the chosen API is unavailable, Previsy uses the other API and warns you (logs, message center, widget). See the "Choosing the weather API" section.
 
+### Open-Meteo model
+**Automatic** (default): Météo-France models (AROME, 1.3 km grid, and ARPEGE) in France and neighbouring countries, best global model elsewhere. You can also force Météo-France or the best global model. Changing the model reloads the forecast.
+
+### Minimum rain for an alert (mm/h)
+An hour of rain or snow only raises an alert if the forecast precipitation reaches this threshold (0.2 mm/h by default). Very small amounts are often uncertain and make alerts appear and disappear. Set 0 to be alerted of any precipitation. This threshold does not apply to "My alerts", which have their own criteria.
+
+### Minimum rain probability for an alert (%)
+An hour of rain or snow only raises an alert if the precipitation probability reaches this threshold (30% by default). Open-Meteo only: prevision-meteo.ch provides no probability. The Météo-France model does not provide one either: the probability of the best global model is then used. Set 0 to disable this filter. It does not apply to "My alerts".
+
 ### Scheduled task (cron)
 If you disable the scheduled task that takes place every hour ... the plugin will be useless ...
 

@@ -121,6 +121,15 @@ L'API utilisée par tous les équipements (Open-Meteo, prevision-meteo.ch), ou �
 ### Repli automatique sur l'autre API
 Si l'API choisie est indisponible, Previsy utilise l'autre API et vous prévient (logs, centre de messages, widget). Voir la section « Choix de l'API météo ».
 
+### Modèle Open-Meteo
+**Automatique** (par défaut) : modèles Météo-France (AROME, maille de 1,3 km, et ARPEGE) en France et dans les pays voisins, meilleur modèle mondial ailleurs. Vous pouvez aussi forcer Météo-France ou le meilleur modèle mondial. Changer de modèle recharge les prévisions.
+
+### Pluie minimale pour une alerte (mm/h)
+Une heure de pluie ou de neige ne lève une alerte que si les précipitations prévues atteignent ce seuil (0,2 mm/h par défaut). Les très faibles quantités sont souvent incertaines et font apparaître puis disparaître des alertes. Mettez 0 pour être alerté de toute précipitation. Ce seuil ne s'applique pas à « Mes alertes », qui ont leurs propres critères.
+
+### Probabilité de pluie minimale pour une alerte (%)
+Une heure de pluie ou de neige ne lève une alerte que si la probabilité de précipitation atteint ce seuil (30 % par défaut). Uniquement avec Open-Meteo : prevision-meteo.ch ne fournit pas de probabilité. Le modèle Météo-France n'en fournit pas non plus : c'est alors la probabilité du meilleur modèle mondial qui est utilisée. Mettez 0 pour désactiver ce filtre. Il ne s'applique pas à « Mes alertes ».
+
 ### Tâche planifiée
 Si vous désactivez la tâche planifiée qui à lieu toutes les heures ... le plugin ne servira plus à rien ...
 

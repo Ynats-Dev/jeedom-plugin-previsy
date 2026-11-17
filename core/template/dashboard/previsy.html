@@ -16,6 +16,8 @@
     #alerte_03_widget#
     #alerte_04_widget#
     #alerte_05_widget#
+    <!-- Les blocs d'alerte sont flottants : sans ce clear, le cadre du widget ne prend pas leur hauteur (bas collé ou rogné) -->
+    <div class="previsyClear"></div>
 
     <script>
         $('.eqLogic[data-eqLogic_uid=#uid#] .cmd').on('click', function () {
@@ -31,6 +33,11 @@
         float:left;
         text-align: center;
     }  
+
+    .previsyClear{
+        clear: both;
+        height: 5px;
+    }
 
     .previsyBlock{
         margin:5px; 

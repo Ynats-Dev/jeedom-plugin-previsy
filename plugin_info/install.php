@@ -23,6 +23,9 @@ function previsy_install() {
     require_once __DIR__ . '/../core/class/bridges/previsy.bridge.php';
     config::save('api_mode', previsy_bridge::DEFAULT_API, 'previsy');
     config::save('api_repli', 1, 'previsy');
+    config::save('open_meteo_modele', 'auto', 'previsy');
+    config::save('seuil_pluie', 0.2, 'previsy');
+    config::save('proba_pluie', 30, 'previsy');
 }
 
 function previsy_update() {
@@ -40,6 +43,15 @@ function previsy_update() {
     }
     if (config::byKey('api_repli', 'previsy', '') === '') {
         config::save('api_repli', 1, 'previsy');
+    }
+    if (config::byKey('open_meteo_modele', 'previsy', '') == '') {
+        config::save('open_meteo_modele', 'auto', 'previsy');
+    }
+    if (config::byKey('seuil_pluie', 'previsy', '') === '') {
+        config::save('seuil_pluie', 0.2, 'previsy');
+    }
+    if (config::byKey('proba_pluie', 'previsy', '') === '') {
+        config::save('proba_pluie', 30, 'previsy');
     }
     foreach (eqLogic::byType('previsy') as $eqLogic) {
         if ($eqLogic->getConfiguration('api', '') == '') {

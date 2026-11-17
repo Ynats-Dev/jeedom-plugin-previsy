@@ -34,7 +34,13 @@
         "L'API utilisée par tous les équipements. Open-Meteo (recommandé) couvre le monde entier ; prevision-meteo.ch couvre la France, la Belgique et la Suisse. « Choix par équipement » laisse chaque équipement choisir son API.": "The API used by all equipments. Open-Meteo (recommended) covers the whole world; prevision-meteo.ch covers France, Belgium and Switzerland. \"Choice per equipment\" lets each equipment choose its API.",
         "Choix par équipement": "Choice per equipment",
         "Repli automatique sur l'autre API": "Automatic fallback to the other API",
-        "Si l'API choisie ne répond pas (panne, saturation, quota), Previsy utilise l'autre API. Un warning est écrit dans les logs et un message est ajouté au centre de messages. L'API choisie est retentée à chaque mise à jour.": "If the chosen API does not respond (outage, saturation, quota), Previsy uses the other API. A warning is written in the logs and a message is added to the message center. The chosen API is tried again at each update."
+        "Si l'API choisie ne répond pas (panne, saturation, quota), Previsy utilise l'autre API. Un warning est écrit dans les logs et un message est ajouté au centre de messages. L'API choisie est retentée à chaque mise à jour.": "If the chosen API does not respond (outage, saturation, quota), Previsy uses the other API. A warning is written in the logs and a message is added to the message center. The chosen API is tried again at each update.",
+        "Modèle Open-Meteo": "Open-Meteo model",
+        "Automatique : modèles Météo-France (AROME, maille de 1,3 km) en France et dans les pays voisins, meilleur modèle mondial ailleurs. Changer de modèle recharge les prévisions.": "Automatic: Météo-France models (AROME, 1.3 km grid) in France and neighbouring countries, best global model elsewhere. Changing the model reloads the forecast.",
+        "Pluie minimale pour une alerte (mm/h)": "Minimum rain for an alert (mm/h)",
+        "Une heure de pluie ou de neige ne lève une alerte que si les précipitations prévues atteignent ce seuil. Les très faibles quantités sont souvent incertaines. 0 = toute précipitation. Ne s'applique pas à « Mes alertes ».": "An hour of rain or snow only raises an alert if the forecast precipitation reaches this threshold. Very small amounts are often uncertain. 0 = any precipitation. Does not apply to \"My alerts\".",
+        "Probabilité de pluie minimale pour une alerte (%)": "Minimum rain probability for an alert (%)",
+        "Une heure de pluie ou de neige ne lève une alerte que si la probabilité de précipitation atteint ce seuil. Uniquement avec Open-Meteo (prevision-meteo.ch ne fournit pas de probabilité). 0 = désactivé. Ne s'applique pas à « Mes alertes ».": "An hour of rain or snow only raises an alert if the precipitation probability reaches this threshold. Open-Meteo only (prevision-meteo.ch does not provide a probability). 0 = disabled. Does not apply to \"My alerts\"."
     },
     "plugins\/previsy\/desktop\/php\/previsy.php": {
         "Gestion": "Management",
@@ -184,7 +190,7 @@
         "Lancement du nettoyage des commandes": "Launching order cleaning",
         "Fin du nettoyage des commandes": "End of order cleaning",
         "Chargement du Json : ": "Loading Json : ",
-        "Temps de cache écoulé rechargement des données depuis prevision-meteo.ch" : "Elapsed cache time reloading data from prevision-meteo.ch",
+        "Temps de cache écoulé rechargement des données depuis prevision-meteo.ch": "Elapsed cache time reloading data from prevision-meteo.ch",
         "Mise à jour depuis le json en cache": "Update from cached json",
         "Json en cache inexistant chargement des données depuis prevision-meteo.ch": "Json in cache non-existent loading data from prevision-meteo.ch",
         "Création du dossier ": "Folder creation ",
@@ -240,9 +246,9 @@
         "Pluie et neige mêlée faible": "Light rain and mixed snow",
         "Pluie et neige mêlée modérée": "Moderate rain and mixed snow",
         "Pluie et neige mêlée forte": "Heavy rain and mixed snow",
-        "Ensoleillé" : "Sunny",
-        "Nuit claire" : "Clear night",
-        "Ciel voilé" : "Veiled sky",
+        "Ensoleillé": "Sunny",
+        "Nuit claire": "Clear night",
+        "Ciel voilé": "Veiled sky",
         "Nuit légèrement voilée": "Slightly veiled night",
         "Faibles passages nuageux": "Weak cloudy passages",
         "Nuit bien dégagée": "Clear night",
@@ -330,7 +336,7 @@
         " heures, soit aujourd'hui à partir de ": " hours, that is today from ",
         " heures, soit tout à l'heure à ": " hours, just now at ",
         " heures, soit demain à partir de ": " hours, tomorrow from ",
-        " heures, soit après-demain à partir de ":  "hours, the day after tomorrow from ",
+        " heures, soit après-demain à partir de ": "hours, the day after tomorrow from ",
         " heures, soit ": " hours, that is ",
         " il va pleuvoir durant ": " it's going to rain during ",
         " un orage est prévu durant ": " a thunderstorm is expected during ",
@@ -376,7 +382,11 @@
     "plugins\/previsy\/core\/class\/bridges\/previsy.bridge.open_meteo.php": {
         "Aucune ville ni coordonnées renseignées": "No city or coordinates provided",
         "Ville introuvable : ": "City not found: ",
-        "erreur inconnue": "unknown error"
+        "erreur inconnue": "unknown error",
+        "Automatique (Météo-France en France et pays voisins)": "Automatic (Météo-France in France and neighbouring countries)",
+        "Météo-France (AROME + ARPEGE)": "Météo-France (AROME + ARPEGE)",
+        "Meilleur modèle mondial (best match)": "Best global model (best match)",
+        "Modèle": "Model"
     },
     "plugins\/previsy\/core\/class\/bridges\/previsy.bridge.prevision_meteo_ch.php": {
         "Aucune ville ni coordonnées renseignées": "No city or coordinates provided"

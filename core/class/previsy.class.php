@@ -674,7 +674,9 @@ class previsy extends eqLogic {
 
             $tmp_cmd = "alerte_0" . $i . "_widget";
             ${$tmp_cmd} = $this->getCmd(null, $tmp_cmd);
-            $replace["#" . $tmp_cmd . "#"] = (is_object(${$tmp_cmd})) ? ${$tmp_cmd}->execCmd() : '';
+            // Un emplacement d'alerte vide peut valoir NULL, "" ou "0" selon la version de Jeedom : on n'affiche que du HTML
+            $widget = (is_object(${$tmp_cmd})) ? ${$tmp_cmd}->execCmd() : '';
+            $replace["#" . $tmp_cmd . "#"] = (is_string($widget) AND strpos($widget, '<') !== FALSE) ? $widget : '';
         }
 
         log::add('previsy', 'debug', __('toHtml :. ', __FILE__) . __('fin', __FILE__));
@@ -771,6 +773,14 @@ class previsy extends eqLogic {
                     if (!is_array($txt_meteo)) { $txt_meteo = array(); }
                     if (!isset($txt_meteo["ALERTE"])) { $txt_meteo["ALERTE"] = NULL; }
                     if (!isset($txt_meteo["TXT"])) { $txt_meteo["TXT"] = NULL; }
+
+                    // Pluie ou neige trop faible ou trop improbable sur l'heure (seuils de la configuration) : pas d'alerte.
+                    // La probabilité n'est filtrée que si l'API la fournit (Open-Meteo).
+                    if (in_array($txt_meteo["ALERTE"], array('pluie', 'neige', 'neige_pluie')) AND (
+                            (is_numeric($getInfoJson["APCPsfc"]) AND floatval($getInfoJson["APCPsfc"]) < previsy_bridge::getSeuilPluie())
+                            OR (is_numeric($getInfoJson["PROBA"]) AND floatval($getInfoJson["PROBA"]) < previsy_bridge::getProbaPluie()))) {
+                        $txt_meteo = array("ALERTE" => NULL, "TXT" => NULL);
+                    }
 
                     if (isset($txt_meteo["ALERTE"]) AND $alertes <= self::getConfigNbAlerte()) {
                         log::add('previsy', 'debug', '---------------------------------------------------------------------------------------');
@@ -925,7 +935,7 @@ class previsy extends eqLogic {
 
         $return = array();
         // isset() et non empty() : une valeur à 0 (0°C, vent nul, 0 mm) est une vraie valeur
-        foreach (array("CONDITION", "CONDITION_KEY", "RH2m", "TMP2m", "WNDGUST10m", "WNDSPD10m", "APCPsfc", "DPT2m", "WNDCHILL2m", "PRMSL", "ISSNOW", "WNDDIR10m") as $key) {
+        foreach (array("CONDITION", "CONDITION_KEY", "RH2m", "TMP2m", "WNDGUST10m", "WNDSPD10m", "APCPsfc", "PROBA", "DPT2m", "WNDCHILL2m", "PRMSL", "ISSNOW", "WNDDIR10m") as $key) {
             $return[$key] = (is_object($hour) AND isset($hour->{$key}) AND $hour->{$key} !== '') ? $hour->{$key} : NULL;
         }
         return $return;
@@ -1016,7 +1026,8 @@ class previsy extends eqLogic {
         foreach ($cmds as $cmd) {
             // Les commandes perso_* et vigilance_* ne sont pas vidées : sinon un scénario déclenché sur leur changement repartirait à chaque mise à jour
             if ($cmd->getLogicalId() != 'refresh' AND strpos($cmd->getLogicalId(), 'perso_') !== 0 AND strpos($cmd->getLogicalId(), 'vigilance_') !== 0) {
-                $_previsy->checkAndUpdateCmd($cmd->getLogicalId(), NULL);
+                // Chaîne vide pour les commandes texte : NULL peut être converti en "0" par Jeedom (affiché sous le widget)
+                $_previsy->checkAndUpdateCmd($cmd->getLogicalId(), $cmd->getSubType() == 'string' ? '' : NULL);
                 log::add('previsy', 'debug', __('clearDatas :. ', __FILE__) . __('#ID# ', __FILE__) . $cmd->getLogicalId());
             }
         }

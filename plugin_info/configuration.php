@@ -66,6 +66,36 @@ if (!isConnect()) {
                 <input type="checkbox" class="configKey" data-l1key="api_repli" />
             </div>
         </div>
+        <div class="form-group">
+            <label class="col-lg-4 control-label">{{Modèle Open-Meteo}}
+                <sup><i class="fas fa-question-circle tooltips" title="{{Automatique : modèles Météo-France (AROME, maille de 1,3 km) en France et dans les pays voisins, meilleur modèle mondial ailleurs. Changer de modèle recharge les prévisions.}}"></i></sup>
+            </label>
+            <div class="col-lg-2">
+                <select class="configKey form-control" data-l1key="open_meteo_modele">
+                    <?php
+                    foreach (previsy_bridge_open_meteo::getModeles() as $modeleId => $modeleLabel) {
+                        echo '<option value="' . $modeleId . '">' . $modeleLabel . '</option>';
+                    }
+                    ?>
+                </select>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-4 control-label">{{Pluie minimale pour une alerte (mm/h)}}
+                <sup><i class="fas fa-question-circle tooltips" title="{{Une heure de pluie ou de neige ne lève une alerte que si les précipitations prévues atteignent ce seuil. Les très faibles quantités sont souvent incertaines. 0 = toute précipitation. Ne s'applique pas à « Mes alertes ».}}"></i></sup>
+            </label>
+            <div class="col-lg-2">
+                <input type="number" min="0" step="0.1" class="configKey form-control" data-l1key="seuil_pluie" placeholder="0.2" />
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-4 control-label">{{Probabilité de pluie minimale pour une alerte (%)}}
+                <sup><i class="fas fa-question-circle tooltips" title="{{Une heure de pluie ou de neige ne lève une alerte que si la probabilité de précipitation atteint ce seuil. Uniquement avec Open-Meteo (prevision-meteo.ch ne fournit pas de probabilité). 0 = désactivé. Ne s'applique pas à « Mes alertes ».}}"></i></sup>
+            </label>
+            <div class="col-lg-2">
+                <input type="number" min="0" max="100" step="5" class="configKey form-control" data-l1key="proba_pluie" placeholder="30" />
+            </div>
+        </div>
         <br />
         <div class="form-group">
             <label class="col-lg-4 control-label">{{Nombre d'alerte en prévision à afficher}}</label>

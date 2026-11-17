@@ -32,8 +32,40 @@ class previsy_bridge_open_meteo {
     public static $_hourly = array(
         'temperature_2m', 'relative_humidity_2m', 'dew_point_2m', 'apparent_temperature',
         'precipitation', 'rain', 'showers', 'snowfall', 'weather_code', 'pressure_msl',
-        'wind_speed_10m', 'wind_direction_10m', 'wind_gusts_10m',
+        'wind_speed_10m', 'wind_direction_10m', 'wind_gusts_10m', 'precipitation_probability',
     );
+
+    // Modèle qui fournit la probabilité de précipitation quand le modèle choisi n'en a pas (Météo-France est déterministe)
+    const MODELE_PROBA = 'best_match';
+
+    // Modèles proposés dans la configuration du plugin (clé config "open_meteo_modele")
+    const MODELE_AUTO = 'auto';
+    public static function getModeles() {
+        return array(
+            self::MODELE_AUTO => __('Automatique (Météo-France en France et pays voisins)', __FILE__),
+            'meteofrance_seamless' => __('Météo-France (AROME + ARPEGE)', __FILE__),
+            'best_match' => __('Meilleur modèle mondial (best match)', __FILE__),
+        );
+    }
+
+    // Zone couverte par AROME (maille fine de Météo-France) : France, Benelux, Suisse, nord de l'Italie et de l'Espagne...
+    public static function dansZoneArome($_latitude, $_longitude) {
+        return $_latitude >= 37.5 AND $_latitude <= 55.4 AND $_longitude >= -12 AND $_longitude <= 16;
+    }
+
+    public static function getModeleConfig() {
+        $modele = config::byKey('open_meteo_modele', 'previsy', self::MODELE_AUTO);
+        return array_key_exists($modele, self::getModeles()) ? $modele : self::MODELE_AUTO;
+    }
+
+    // Modèle réellement interrogé pour ce lieu
+    public static function getModele($_latitude, $_longitude) {
+        $modele = self::getModeleConfig();
+        if ($modele == self::MODELE_AUTO) {
+            return self::dansZoneArome(floatval($_latitude), floatval($_longitude)) ? 'meteofrance_seamless' : 'best_match';
+        }
+        return $modele;
+    }
 
     public static function getLabel() {
         return 'Open-Meteo';
@@ -59,9 +91,14 @@ class previsy_bridge_open_meteo {
             $city = array('name' => $geo['name'], 'country' => $geo['country']);
         }
 
+        $modele = self::getModele($localisation['latitude'], $localisation['longitude']);
+        log::add('previsy', 'debug', 'previsy_bridge_open_meteo::fetch :. ' . __('Modèle', __FILE__) . ' [' . $modele . ']');
+
         $url = self::$_urlApi
                 . '?latitude=' . $localisation['latitude']
                 . '&longitude=' . $localisation['longitude']
+                // Modèle choisi + modèle mondial (uniquement pour la probabilité de précipitation)
+                . '&models=' . $modele . ($modele != self::MODELE_PROBA ? ',' . self::MODELE_PROBA : '')
                 . '&hourly=' . implode(',', self::$_hourly)
                 . '&daily=sunrise,sunset'
                 . '&wind_speed_unit=kmh'
@@ -79,7 +116,7 @@ class previsy_bridge_open_meteo {
             return NULL;
         }
 
-        return self::mapping($json, $city);
+        return self::mapping($json, $city, $modele);
     }
 
     // Retourne array(latitude, longitude, name, country), FALSE si ville inconnue, NULL si API injoignable
@@ -105,11 +142,26 @@ class previsy_bridge_open_meteo {
     }
 
     // Conversion Open-Meteo -> format pivot
-    public static function mapping($_json, $_city) {
+    // Avec plusieurs modèles, Open-Meteo suffixe chaque clé par le modèle (ex. "precipitation_meteofrance_seamless")
+    public static function valeur($_bloc, $_key, $_index, $_modele = NULL) {
+        if ($_modele !== NULL AND isset($_bloc->{$_key . '_' . $_modele})) {
+            $serie = $_bloc->{$_key . '_' . $_modele};
+        } elseif (isset($_bloc->{$_key})) {
+            $serie = $_bloc->{$_key};
+        } else {
+            return NULL;
+        }
+        return isset($serie[$_index]) ? $serie[$_index] : NULL;
+    }
+
+    public static function mapping($_json, $_city, $_modele = NULL) {
         $return = new stdClass();
 
-        $sunrise = isset($_json->daily->sunrise[0]) ? substr($_json->daily->sunrise[0], 11, 5) : NULL;
-        $sunset = isset($_json->daily->sunset[0]) ? substr($_json->daily->sunset[0], 11, 5) : NULL;
+        $daily = isset($_json->daily) ? $_json->daily : new stdClass();
+        $sunrise = self::valeur($daily, 'sunrise', 0, $_modele);
+        $sunset = self::valeur($daily, 'sunset', 0, $_modele);
+        $sunrise = ($sunrise !== NULL) ? substr($sunrise, 11, 5) : NULL;
+        $sunset = ($sunset !== NULL) ? substr($sunset, 11, 5) : NULL;
 
         $return->city_info = (object) array(
             'name' => $_city['name'],
@@ -135,9 +187,15 @@ class previsy_bridge_open_meteo {
                 $return->{$dayKey} = (object) array('date' => $date->format('d.m.Y'), 'hourly_data' => new stdClass());
             }
 
-            $v = function ($_key) use ($hourly, $index) {
-                return isset($hourly->{$_key}[$index]) ? $hourly->{$_key}[$index] : NULL;
+            $v = function ($_key) use ($hourly, $index, $_modele) {
+                return self::valeur($hourly, $_key, $index, $_modele);
             };
+
+            // Probabilité du modèle choisi, sinon celle du modèle mondial
+            $proba = $v('precipitation_probability');
+            if ($proba === NULL) {
+                $proba = self::valeur($hourly, 'precipitation_probability', $index, self::MODELE_PROBA);
+            }
 
             $precipitation = $v('precipitation');
             $snowfall = $v('snowfall');
@@ -154,6 +212,7 @@ class previsy_bridge_open_meteo {
                 'RH2m' => $v('relative_humidity_2m'),
                 'PRMSL' => $v('pressure_msl'),
                 'APCPsfc' => $precipitation,
+                'PROBA' => $proba,
                 'ISSNOW' => (floatval($snowfall) > 0) ? 1 : 0,
                 'WNDSPD10m' => $v('wind_speed_10m'),
                 'WNDGUST10m' => $v('wind_gusts_10m'),
@@ -171,6 +230,13 @@ class previsy_bridge_open_meteo {
             return array(NULL, NULL);
         }
         $code = (int) $_code;
+
+        // Open-Meteo renvoie parfois un code de pluie/neige (bruine, pluie, averses, neige) avec 0 mm sur l'heure :
+        // sans précipitation réelle, on ne lève pas d'alerte (sinon « il va pleuvoir » avec précipitation « Néant »).
+        // Les orages (95+) sont conservés : un orage peut être sec.
+        if ($code >= 51 AND $code <= 86 AND $_precipitation !== NULL AND floatval($_precipitation) <= 0) {
+            return array('Fortement nuageux', 'fortement-nuageux');
+        }
 
         // Pluie et neige en même temps : WMO n'a pas de code dédié
         if (floatval($_pluie) > 0 AND floatval($_neige) > 0 AND $code >= 51 AND $code <= 86) {

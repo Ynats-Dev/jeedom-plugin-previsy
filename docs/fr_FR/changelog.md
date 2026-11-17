@@ -1,3 +1,11 @@
+# 17/11/2026 | Beta 2.0.1
+- NOUVEAU : Choix du modèle Open-Meteo dans la configuration. Par défaut « Automatique » : modèles Météo-France (AROME, maille de 1,3 km) en France et dans les pays voisins, meilleur modèle mondial ailleurs. Prévisions plus fiables, notamment pour les averses.
+- NOUVEAU : Pluie minimale pour une alerte (0,2 mm/h par défaut) : les traces de pluie ou de neige, peu fiables, ne lèvent plus d'alerte standard.
+- NOUVEAU : Probabilité de pluie minimale pour une alerte (30 % par défaut, Open-Meteo uniquement) : une heure de pluie ou de neige improbable ne lève plus d'alerte standard. Avec le modèle Météo-France, qui ne fournit pas de probabilité, celle du meilleur modèle mondial est utilisée.
+- BUG : Open-Meteo : une alerte « pluie » pouvait être levée sur des heures sans précipitation (précipitation « Néant »).
+- BUG : Un « 0 » s'affichait sous le widget quand il n'y avait qu'une seule alerte.
+- BUG : Le bas du widget était collé, voire rogné, sous la dernière alerte.
+
 # 08/11/2026 | Beta 2.0.0
 - NOUVEAU : Widget pour l'application mobile.
 - NOUVEAU : La commande Rafraichir recharge réellement les prévisions depuis l'API (au plus une fois toutes les 5 minutes).
